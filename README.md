@@ -3,7 +3,15 @@
 
 ## Overview
 
-This project utilizes Graph Neural Networks (GNNs) for enhancing the analysis of protein structures by employing a method called transfer learning. Specifically, our Global Structure Embedding Network (GSnet) is designed to predict several molecular properties of proteins from their three-dimensional structures, including solvation energies and hydrodynamic radii. A notable feature of GSnet is its capability to make rapid and accurate pKa predictions, which are crucial for understanding protein behavior in different environments. This README outlines the project structure, installation steps, and usage instructions to help you get started with our tools and models.
+This document offers an overview of the project, installation steps, and instructions to help users effectively implement and utilize our tools and models.
+
+### Graph Neural Network-Based Prediction
+
+This project leverages Graph Neural Networks (GNNs) to accelerate the computational prediction of protein properties. Our model, the `Global Structure Embedding Network (GSnet)`, is adept at predicting a variety of physicochemical properties from three-dimensional protein structures. These properties include, but are not limited to, solvation energies and hydrodynamic radii, which are crucial for understanding protein behavior in biological systems.
+
+### Transfer Learning for pKa Predictions
+
+A notable feature of `GSnet`, and the related `a-GSnet`, is their ability to deliver rapid and accurate predictions of pKa values, achieved by pretraining on related properties and simulated pKa values, respectively. The application of transfer learning allows these models to utilize previously learned representations, enhancing their predictive accuracy even with limited specific training data. 
 
 ## Table of Contents
 
