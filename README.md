@@ -178,8 +178,8 @@ python predict.py pdb_file.pdb
 ```
 - **Sample Output:**
 ```
-ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      pdb_file.pdb
--27.580E   12.391E   22.216E   0.982E   0.734E   38.517E   pdb_file.pdb
+ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
+-27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       pdb_file.pdb
 ```
 
 #### Solvent-Accessible Surface Area (SASA) Prediction
@@ -189,8 +189,8 @@ python predict.py --sasa pdb_file.pdb
 ```
 - **Sample Output:**
 ```
-ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   pdb_file.pdb
--47.580E   18.391E   34.216E   1.582E   0.934E   52.817E   24.816E   pdb_file.pdb
+ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE
+-27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       57.129E       pdb_file.pdb
 ```
 
 ### Troubleshooting
