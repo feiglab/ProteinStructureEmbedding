@@ -52,122 +52,6 @@ from torch_geometric.nn import radius_graph
 from torch_geometric.typing import Adj, Size, OptTensor, Tensor
 
 
-def map_a_tensor(input_tensor):
-    """
-    Maps an input tensor of specific values to a one-hot encoded tensor.
-
-    The mapping is defined by the `a_to_aa` dictionary, where the keys are the
-    input values, and the values are the corresponding one-hot encoded indices.
-
-    Args:
-        input_tensor (torch.Tensor): Input tensor containing values to be mapped.
-
-    Returns:
-        torch.Tensor: A tensor with one-hot encoding based on the mapping.
-    """
-    a_to_aa = {
-        10: 0,
-        2: 1,
-        13: 2,
-        14: 3,
-        5: 4,
-        16: 5
-    }
-
-    num_classes = len(a_to_aa)
-    mapped_tensor = torch.zeros((num_classes, len(input_tensor)))
-
-    for i, value in enumerate(input_tensor):
-        mapped_value = a_to_aa[int(value.item())]
-        mapped_tensor[mapped_value, i] = 1
-
-    return mapped_tensor.t()
-
-
-class ResidualBlock(torch.nn.Module):
-    """
-    Residual GNN block.
-    """
-    def __init__(self, block, dim):
-        super().__init__()
-        self.block = block
-        self.layernorm = nn.LayerNorm(dim)
-        self.act = nn.ReLU()
-
-    def reset_parameters(self):
-        self.block.reset_parameters()
-
-    def forward(self, x, edge_index, edge_weight, edge_attr):
-        h = self.block(x, edge_index, edge_weight, edge_attr)
-        h = self.layernorm(h)
-        h = self.act(h)
-
-        return h
-
-'''
-def radius(x, y, r, batch_x=None, batch_y=None, max_num_neighbors=32, batch_size=None):
-    """
-    Custom 'radius' implementation
-    """
-    if x.numel() == 0 or y.numel() == 0:
-        return torch.empty(2, 0, dtype=torch.long, device=x.device)
-
-    x = x.unsqueeze(1) if x.dim() == 1 else x
-    y = y.unsqueeze(1) if y.dim() == 1 else y
-
-    # Compute squared distances using broadcasting
-    dists_squared = torch.sum((x.unsqueeze(1) - y.unsqueeze(0)) ** 2, dim=-1)
-
-    # Get the indices of distances that are less than r^2
-    row, col = (dists_squared < r ** 2).nonzero(as_tuple=True)
-
-    # Enforce the max_num_neighbors constraint
-    row_list, col_list = [], []
-    for i in range(y.size(0)):
-        neighbors = (row == i).nonzero(as_tuple=True)[0]
-        neighbors = neighbors[:max_num_neighbors]
-        row_list.extend(row[neighbors].tolist())
-        col_list.extend(col[neighbors].tolist())
-
-    row = torch.tensor(row_list, dtype=torch.long, device=x.device)
-    col = torch.tensor(col_list, dtype=torch.long, device=x.device)
-
-    result = torch.stack([row, col], dim=0)
-    #print(result.shape)
-    #print(result)
-
-    return result
-'''
-
-'''
-def radius_graph(x, r, batch=None, loop=False, max_num_neighbors=32, flow='source_to_target', batch_size=None):
-    """
-    Custom 'radius_graph' implementation
-    """
-    assert flow in ['source_to_target', 'target_to_source']
-    
-    if batch is not None:
-        batch_size = 8
-    
-    edge_index = radius(x, x, r, batch, batch, max_num_neighbors if loop else max_num_neighbors + 1, batch_size)
-
-    if flow == 'source_to_target':
-        row, col = edge_index[1], edge_index[0]
-    else:
-        row, col = edge_index[0], edge_index[1]
-
-    if not loop:
-        mask = row != col
-        row, col = row[mask], col[mask]
-
-    result = torch.stack([row, col], dim=0)
-
-    #print(result.shape)
-    #print(result)
-
-    return result
-'''
-
 class Net(nn.Module):
     """
     GNN architecture for GSnet. 
@@ -313,47 +197,47 @@ class Net(nn.Module):
         assert not (conv_output and transformer_output), 'Choose one type of output network'
 
         ## Attributes
-        self.param = nn.Parameter(torch.empty(0))   # Dummy parameter (use 'Net.param' to see parameter attributes)
-        self.last_file = None                       # Allows storing last file for debugging (e.g. `net.last_file = input_file)`
-        self.gnn_layer = gnn_layer                  # Type of GNN layer ('cfconv', 'transformerconv', 'egnn')
-        self.hidden_channels = hidden_channels      # Number of hidden channels in GNN layers
-        self.num_filters = num_filters              # Number of filters in GNN layers
-        self.num_interactions = num_interactions    # Number of GNN layers
-        self.num_gaussians = num_gaussians          # Number of gaussians used in distance expansion
-        self.cutoff = cutoff                        # Cutoff (in angstrom) for edges
-        self.max_num_neighbors = max_num_neighbors  # Max number of edges per node
-        self.readout = readout                      # Node pooling method
-        self.scale = None                           #
-        self.out_channels = out_channels            # Number of outputs
-        self.use_transfer = use_transfer            # Enable transferred learning
-        self.out_channels_t = out_channels_t        # Number of outputs (for transferred learning)
-        self.dropout = dropout                      # Dropout for linear layers (0: no dropout)
-        self.num_linear = num_linear                # Number of linear layers
-        if linear_channels is None:                 #
-            linear_channels = hidden_channels // 2  #
-        self.linear_channels = linear_channels      # Number of hidden channels in linear layers
-        self.layernorm = layernorm                  # Enable layer normalization in linear layers
-        self.residue_pred = residue_pred            # Enable residue-level predictions (Need to set 'resid' in '_forward')
-        self.residue_pooling = residue_pooling      # Pool residue information over all hidden channels (default=True)
-        self.global_mean = global_mean              # Combine global mean with residue (cat)
-        self.bond_edges = bond_edges                # Additional edge weight dimension for bonded edges (eg. 0: no bond; 1: bond)
-        self.cc_embedding = cc_embedding            # Embedding type for CA-CofM distances
-        self.standardize_cc = standardize_cc        # Standardize CA-CofM distances
-        self.embedding_only = embedding_only        # Output GNN embedding only (No linear la
-        self.scatter_embedding = scatter_embedding  # Run torch_scatter.scatter() on embedding
-        self.pka_embedding = pka_embedding          # Get embedding for pKa predictions
-        self.env_thresh = env_thresh                # Get local environment embeddings (Å)
-        self.env_mlp = env_mlp                      # Run MLP across all env features to reduce dimensionality
-        self.include_input = include_input          # Include input features in FC
-        self.one_hot_res = one_hot_res              # Include one-hot encoding for aa type in FC
-        self.pad_thresh = pad_thresh                # Thresh (Å) for padding residue feats
-        self.conv_output = conv_output              # Use CNN as output block
-        self.transformer_output = transformer_output# Use transformer as output block
-        self.transformer_layers = transformer_layers# Number of transformer layers for output
-        self.t_heads = t_heads                      # Number of transformer heads for output
-        self.cofactors = cofactors                  # Specify whether to use additional input for cofactors
-        self.atomic_gnn = atomic_gnn                # Use the atomic GNN?
-        self.atomic_gnn_args = atomic_gnn_args      # Arguments for atomic GNN
+        self.param = nn.Parameter(torch.empty(0))    # Dummy parameter (use 'Net.param' to see parameter attributes)
+        self.last_file = None                        # Allows storing last file for debugging (e.g. `net.last_file = input_file)`
+        self.gnn_layer = gnn_layer                   # Type of GNN layer ('cfconv', 'transformerconv', 'egnn')
+        self.hidden_channels = hidden_channels       # Number of hidden channels in GNN layers
+        self.num_filters = num_filters               # Number of filters in GNN layers
+        self.num_interactions = num_interactions     # Number of GNN layers
+        self.num_gaussians = num_gaussians           # Number of gaussians used in distance expansion
+        self.cutoff = cutoff                         # Cutoff (in angstrom) for edges
+        self.max_num_neighbors = max_num_neighbors   # Max number of edges per node
+        self.readout = readout                       # Node pooling method
+        self.scale = None                            #
+        self.out_channels = out_channels             # Number of outputs
+        self.use_transfer = use_transfer             # Enable transferred learning
+        self.out_channels_t = out_channels_t         # Number of outputs (for transferred learning)
+        self.dropout = dropout                       # Dropout for linear layers (0: no dropout)
+        self.num_linear = num_linear                 # Number of linear layers
+        if linear_channels is None:                  #
+            linear_channels = hidden_channels // 2   #
+        self.linear_channels = linear_channels       # Number of hidden channels in linear layers
+        self.layernorm = layernorm                   # Enable layer normalization in linear layers
+        self.residue_pred = residue_pred             # Enable residue-level predictions (Need to set 'resid' in '_forward')
+        self.residue_pooling = residue_pooling       # Pool residue information over all hidden channels (default=True)
+        self.global_mean = global_mean               # Combine global mean with residue (cat)
+        self.bond_edges = bond_edges                 # Additional edge weight dimension for bonded edges (eg. 0: no bond; 1: bond)
+        self.cc_embedding = cc_embedding             # Embedding type for CA-CofM distances
+        self.standardize_cc = standardize_cc         # Standardize CA-CofM distances
+        self.embedding_only = embedding_only         # Output GNN embedding only (No linear la
+        self.scatter_embedding = scatter_embedding   # Run torch_scatter.scatter() on embedding
+        self.pka_embedding = pka_embedding           # Get embedding for pKa predictions
+        self.env_thresh = env_thresh                 # Get local environment embeddings (Å)
+        self.env_mlp = env_mlp                       # Run MLP across all env features to reduce dimensionality
+        self.include_input = include_input           # Include input features in FC
+        self.one_hot_res = one_hot_res               # Include one-hot encoding for aa type in FC
+        self.pad_thresh = pad_thresh                 # Thresh (Å) for padding residue feats
+        self.conv_output = conv_output               # Use CNN as output block
+        self.transformer_output = transformer_output # Use transformer as output block
+        self.transformer_layers = transformer_layers # Number of transformer layers for output
+        self.t_heads = t_heads                       # Number of transformer heads for output
+        self.cofactors = cofactors                   # Specify whether to use additional input for cofactors
+        self.atomic_gnn = atomic_gnn                 # Use the atomic GNN?
+        self.atomic_gnn_args = atomic_gnn_args       # Arguments for atomic GNN
 
         ## Activation for GNN layers
         if activation == 'ssp':
@@ -1375,6 +1259,220 @@ class MoE(nn.Module):
         else:
             return output, weights
 
+
+
+def map_a_tensor(input_tensor):
+    """
+    Maps an input tensor of specific values to a one-hot encoded tensor.
+
+    The mapping is defined by the `a_to_aa` dictionary, where the keys are the
+    input values, and the values are the corresponding one-hot encoded indices.
+
+    Args:
+        input_tensor (torch.Tensor): Input tensor containing values to be mapped.
+
+    Returns:
+        torch.Tensor: A tensor with one-hot encoding based on the mapping.
+    """
+    a_to_aa = {
+        10: 0,
+        2: 1,
+        13: 2,
+        14: 3,
+        5: 4,
+        16: 5
+    }
+
+    num_classes = len(a_to_aa)
+    mapped_tensor = torch.zeros((num_classes, len(input_tensor)))
+
+    for i, value in enumerate(input_tensor):
+        mapped_value = a_to_aa[int(value.item())]
+        mapped_tensor[mapped_value, i] = 1
+
+    return mapped_tensor.t()
+
+
+def radius(x, y, r, batch_x=None, batch_y=None, max_num_neighbors=32, batch_size=None):
+    """
+    Custom 'radius' implementation to find neighbor pairs within a specified radius.
+
+    Parameters
+    ----------
+    x : torch.Tensor
+        Source coordinates with shape (N, D) where N is the number of points and D is the dimensionality.
+    y : torch.Tensor
+        Target coordinates with shape (M, D) where M is the number of points and D is the dimensionality.
+    r : float
+        Radius within which to search for neighbors.
+    batch_x : torch.Tensor, optional
+        Batch indices for x. Default is None.
+    batch_y : torch.Tensor, optional
+        Batch indices for y. Default is None.
+    max_num_neighbors : int, optional
+        Maximum number of neighbors to return for each point in y. Default is 32.
+    batch_size : int, optional
+        Batch size for processing. Default is None.
+
+    Returns
+    -------
+    torch.Tensor
+        Tensor of shape (2, E) where E is the number of edges (neighbor pairs).
+        The first row contains the indices of the source points, and the second row contains the indices of the target points.
+    """
+    # Return empty tensor if there are no elements in x or y
+    if x.numel() == 0 or y.numel() == 0:
+        return torch.empty(2, 0, dtype=torch.long, device=x.device)
+
+    # Ensure x and y are at least 2-dimensional
+    x = x.unsqueeze(1) if x.dim() == 1 else x
+    y = y.unsqueeze(1) if y.dim() == 1 else y
+
+    # Compute squared distances using broadcasting
+    dists_squared = torch.sum((x.unsqueeze(1) - y.unsqueeze(0)) ** 2, dim=-1)
+
+    # Get the indices of distances that are less than r^2
+    row, col = (dists_squared < r ** 2).nonzero(as_tuple=True)
+
+    # Enforce the max_num_neighbors constraint
+    row_list, col_list = [], []
+    for i in range(y.size(0)):
+        neighbors = (row == i).nonzero(as_tuple=True)[0]
+        neighbors = neighbors[:max_num_neighbors]
+        row_list.extend(row[neighbors].tolist())
+        col_list.extend(col[neighbors].tolist())
+
+    # Convert lists to tensors
+    row = torch.tensor(row_list, dtype=torch.long, device=x.device)
+    col = torch.tensor(col_list, dtype=torch.long, device=x.device)
+
+    # Stack the row and col tensors to create the result
+    result = torch.stack([row, col], dim=0)
+
+    return result
+
+
+def radius_graph(x, r, batch=None, loop=False, max_num_neighbors=32, flow='source_to_target', batch_size=None):
+    """
+    Custom 'radius_graph' implementation to construct a graph where edges connect nodes within a specified radius.
+
+    Parameters
+    ----------
+    x : torch.Tensor
+        Node coordinates with shape (N, D) where N is the number of nodes and D is the dimensionality.
+    r : float
+        Radius within which to search for neighboring nodes.
+    batch : torch.Tensor, optional
+        Batch indices for x. Default is None.
+    loop : bool, optional
+        If True, self-loops are included in the graph. Default is False.
+    max_num_neighbors : int, optional
+        Maximum number of neighbors to return for each node. Default is 32.
+    flow : str, optional
+        Direction of message passing ('source_to_target' or 'target_to_source'). Default is 'source_to_target'.
+    batch_size : int, optional
+        Batch size for processing. Default is None.
+
+    Returns
+    -------
+    torch.Tensor
+        Tensor of shape (2, E) where E is the number of edges (neighbor pairs).
+        The first row contains the indices of the source nodes, and the second row contains the indices of the target nodes.
+    """
+    assert flow in ['source_to_target', 'target_to_source'], "flow must be 'source_to_target' or 'target_to_source'"
+
+    # Set batch_size if batch is not None
+    if batch is not None:
+        batch_size = 8
+
+    # Get edge indices within the specified radius
+    edge_index = radius(x, x, r, batch, batch, max_num_neighbors if loop else max_num_neighbors + 1, batch_size)
+
+    # Adjust edge direction based on flow
+    if flow == 'source_to_target':
+        row, col = edge_index[1], edge_index[0]
+    else:
+        row, col = edge_index[0], edge_index[1]
+
+    # Remove self-loops if loop is False
+    if not loop:
+        mask = row != col
+        row, col = row[mask], col[mask]
+
+    # Stack the row and col tensors to create the result
+    result = torch.stack([row, col], dim=0)
+
+    return result
+
+
+class ResidualBlock(nn.Module):
+    """
+    Residual GNN block.
+    
+    This class defines a residual block for a Graph Neural Network (GNN).
+    It includes a layer normalization step followed by a ReLU activation.
+    
+    Parameters
+    ----------
+    block : nn.Module
+        The neural network block to apply within the residual block.
+    dim : int
+        The dimension of the input and output features.
+    
+    Methods
+    -------
+    reset_parameters():
+        Resets the parameters of the block.
+    forward(x, edge_index, edge_weight, edge_attr):
+        Forward pass through the residual block.
+    """
+    def __init__(self, block, dim):
+        super(ResidualBlock, self).__init__()
+        self.block = block  # The neural network block to apply
+        self.layernorm = nn.LayerNorm(dim)  # Layer normalization
+        self.act = nn.ReLU()  # ReLU activation
+
+    def reset_parameters(self):
+        """
+        Resets the parameters of the block.
+        """
+        self.block.reset_parameters()
+
+    def forward(self, x, edge_index, edge_weight, edge_attr):
+        """
+        Forward pass through the residual block.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input node features.
+        edge_index : torch.Tensor
+            Graph edge indices.
+        edge_weight : torch.Tensor
+            Edge weights.
+        edge_attr : torch.Tensor
+            Edge attributes.
+
+        Returns
+        -------
+        torch.Tensor
+            Output node features after applying the residual block.
+        """
+        # Apply the block to the input features and edge data
+        h = self.block(x, edge_index, edge_weight, edge_attr)
+        # Apply layer normalization
+        h = self.layernorm(h)
+        # Apply ReLU activation
+        h = self.act(h)
+
+        return h
+
+    def __repr__(self):
+        return (f'{self.__class__.__name__}('
+                f'block={self.block}, '
+                f'layernorm={self.layernorm}, '
+                f'act={self.act}) ')
+        
 
 class InteractionBlock(nn.Module):
     """
