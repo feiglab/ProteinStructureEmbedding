@@ -1,4 +1,4 @@
-# GSNet
+# Enhancing Protein Analysis via Transfer Learning with Graph Neural Networks  
 
 ## To do
 
