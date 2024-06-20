@@ -11,7 +11,7 @@ This project leverages Graph Neural Networks (GNNs) to accelerate the computatio
 
 ### Transfer Learning for pKa Predictions
 
-A notable feature of `GSnet`, and the related `a-GSnet`, is their ability to deliver rapid and accurate predictions of pKa values, achieved by pretraining on related properties and simulated pKa values, respectively. The application of transfer learning allows these models to utilize previously learned representations, enhancing their predictive accuracy even with limited specific training data. 
+A notable feature of `GSnet`, and the related `a-GSnet`, is their ability to deliver rapid and accurate predictions of experimental pKa values, achieved by pretraining on related properties and simulated pKa values, respectively. The application of transfer learning allows these models to utilize previously learned representations, enhancing their predictive accuracy even with limited specific training data. 
 
 ## Table of Contents
 
