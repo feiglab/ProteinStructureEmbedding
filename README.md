@@ -1,6 +1,10 @@
 # GSNet
 
-`...`
+## To do
+
+- Add pretrained models (will be large files though, may need to upload elsewhere)
+- Polish up and add training scripts
+- Anything else??
 
 ## Table of Contents
 
