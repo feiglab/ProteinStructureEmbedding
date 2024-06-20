@@ -15,67 +15,16 @@ A notable feature of `GSnet`, and the related `a-GSnet`, is their ability to del
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Usage](#usage)
 - [Directory Structure](#directory-structure)
+- [Installation](#installation)
+- [Pretrained Models](#pretrained-models)
+- [Generating Embeddings](#generating-embeddings)
+- [Making Predictions](#making-predictions)
+- [Generating Datasets](#generating-datasets)
+- [Implementing our Networks](#implementing-our-networks)
 - [Contributing](#contributing)
 - [License](#license)
 - [To do](#to-do)
-
-## Installation
-
-Before you can run the models and use the codebase, you need to set up your environment:
-
-1. **Clone the repository:**
-   ```
-   git clone https://github.com/your-repository/hydropro_ml.git
-   cd hydropro_ml
-   ```
-
-2. **Install required packages:**
-   - Ensure that Python 3.8 or newer is installed on your system.
-   - Install the required Python packages using:
-     ```
-     pip install -r requirements.txt
-     ```
-
-3. **Set up the environment:**
-   - If you use a virtual environment, set it up and activate it before installing the packages:
-     ```
-     python -m venv venv
-     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-     ```
-
-## Usage
-
-To utilize our project, follow these steps:
-
-1. **Prepare your data:**
-   - Ensure your data is in the correct format as described in the `datasets/` directory.
-
-2. **Training the model:**
-   - To train the model with the provided datasets, run:
-     ```
-     python src/train.py --dataset datasets/train.0.csv
-     ```
-
-3. **Generating embeddings:**
-   - Generate embeddings for new protein structures:
-     ```
-     python src/embed.py --input your_protein_data.pdb --output embeddings.csv
-     ```
-
-4. **Making predictions:**
-   - Use the trained model to predict properties:
-     ```
-     python src/predict.py --model path_to_model --input embeddings.csv --output predictions.csv
-     ```
-
-5. **Evaluating the model:**
-   - Evaluate the model's performance with the validation set:
-     ```
-     python src/evaluate.py --model path_to_model --dataset datasets/val.0.csv
-     ```
 
 ## Directory Structure
 
@@ -102,6 +51,170 @@ hydropro_ml/
 ├── setup.py            # Script for installing our model as a package.
 └── README.md           # The file you are currently reading.
 ```
+
+## Installation
+
+Before you can run the models and use the codebase, you need to set up your environment:
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-repository/hydropro_ml.git
+   cd hydropro_ml
+   ```
+
+2. **Install required packages:**
+   - Ensure that Python 3.8 or newer is installed on your system.
+   - Install the required Python packages using:
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+3. **Set up the environment:**
+   - If you use a virtual environment, set it up and activate it before installing the packages:
+     ```
+     python -m venv venv
+     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+     ```
+
+## Pretrained Models
+
+`...`
+
+## Generating Embeddings
+
+### Overview
+
+This section describes how to generate embeddings for all PDB files within a specified directory. Embeddings are crucial for downstream prediction tasks and are saved for subsequent use.
+
+### Steps to Generate Embeddings
+
+1. **Prepare your environment:**
+ Ensure you have followed the installation instructions to set up your environment correctly. This includes having the necessary Python packages installed and the environment activated.
+
+2. **Obtain the model:**
+ Currently, you will need to manually download our pre-trained model `pka_from_sasa_res.pt` from the provided link (link to be added). Place this model in an appropriate directory accessible to your script.
+
+3. **Run the script:**
+ Navigate to the `src/` directory in your terminal. Use the following command to generate embeddings:
+ ```
+ python embed.py <path_to_PDB_files> <output_path_for_embeddings>
+ ```
+ Replace `<path_to_PDB_files>` with the directory containing your PDB files and `<output_path_for_embeddings>` with the directory where you want to save the embeddings.
+
+### Example Command
+
+```
+python embed.py /path/to/pdb /path/to/output
+```
+
+This command processes all PDB files in `/path/to/pdb` and saves the resulting embeddings in `/path/to/output`.
+
+### Troubleshooting
+
+- Ensure that the paths provided are correct and accessible.
+- Verify that the pre-trained model file is in the correct directory and properly named.
+- Check your Python environment if you encounter dependencies errors.
+- If the script fails with a CUDA error and you are running on a GPU, ensure that your device has sufficient memory and is compatible.
+
+### Notes
+
+- The script utilizes multiprocessing to expedite the embedding process. Ensure your system has adequate resources to handle multiple processes simultaneously.
+- The embedding process is sensitive to the structure and quality of the input PDB files. Ensure that the files are correctly formatted and contain all necessary information.
+
+This method of generating embeddings is integral to leveraging the predictive power of our GNN models for analyzing protein structures.
+
+## Making Predictions
+
+### Overview
+
+This section explains how to use our models to make predictions on protein properties such as pKa values and other physicochemical properties from protein structures. The steps below include how to run the script with different options to predict specific properties.
+
+### Steps to Make Predictions
+
+1. **Prepare your environment:**
+ Ensure your environment is properly set up as described in the [installation section](#installation), and you have the necessary [pre-trained models](#pretrained-models) downloaded.
+
+2. **Run the prediction script:**
+ Use the command below, substituting `<path_to_pdb_file>` with your PDB file's path:
+ ```
+ python predict.py --option <path_to_pdb_file>
+ ```
+ Replace `--option` with either `--pka`, `--sasa`, or no option for default predictions.
+
+### Making Predictions
+
+#### pKa Prediction
+- **pKa value prediction:**
+```
+python predict.py --pka pdb_file.pdb
+```
+- **Sample Output:**
+```
+...
+7.315245148533568 LYS 4 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+3.9241322437930055 ASP 5 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+8.401511664982062 LYS 7 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+3.903559068776328 ASP 11 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+...
+```
+- **pKa shift prediction:**
+```
+python predict.py --pka --shift pdb_file.pdb
+```
+- **Sample Output:**
+```
+...
+-3.2247548514664315 LYS 4 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+0.024132243793005603 ASP 5 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+-2.1384883350179376 LYS 7 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+0.003559068776328278 ASP 11 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+...
+```
+
+#### Default Physicochemical Properties Prediction
+- **Command:**
+```
+python predict.py pdb_file.pdb
+```
+- **Sample Output:**
+```
+ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      pdb_file.pdb
+-27.580E   12.391E   22.216E   0.982E   0.734E   38.517E   pdb_file.pdb
+```
+
+#### Solvent-Accessible Surface Area (SASA) Prediction
+- **Command:**
+```
+python predict.py --sasa pdb_file.pdb
+```
+- **Sample Output:**
+```
+ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   pdb_file.pdb
+-47.580E   18.391E   34.216E   1.582E   0.934E   52.817E   24.816E   pdb_file.pdb
+```
+
+### Troubleshooting
+
+- Ensure all paths are correct and the necessary files are accessible.
+- Verify that the pre-trained model files are in the correct directory and are properly named.
+- Check your Python environment if you encounter dependency errors.
+- If the script fails with a CUDA error and you are running on a GPU, make sure your device has sufficient memory and is compatible.
+
+### Notes
+
+- The script is capable of handling multiple input files and can process them in batches if specified.
+- For detailed error messages and troubleshooting, the script outputs logs that can be checked in case of failures.
+- Remember to use the cleaning options if your PDB files might contain non-standard residues or formats.
+
+These methods allow for the flexible application of our models to a variety of prediction tasks in protein analysis.
+
+## Generating Datasets
+
+`...`
+
+## Implementing our Networks
+
+`...`
 
 ## Contributing
 
