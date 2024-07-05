@@ -15,7 +15,9 @@ A notable feature of `GSnet`, and the related `a-GSnet`, is their ability to del
 
 ### Paper
 
-Our paper detailing the methodologies and findings of this project is currently a pre-print submitted to the *Journal of Chemical Theory and Computation (JCTC), ACS*. You can access the pre-print at the following link:
+Our paper detailing the methodologies and findings of this project is currently a pre-print submitted to the *Journal of Chemical Theory and Computation (JCTC), ACS*. 
+
+You can access the pre-print at the following link:
 
 [Enhancing Protein Analysis via Transfer Learning with Graph Neural Networks](https://arxiv.org/)
 
