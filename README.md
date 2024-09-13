@@ -15,15 +15,13 @@ A notable feature of `GSnet`, and the related `a-GSnet`, is their ability to del
 
 ### Paper
 
-Our paper detailing the methodologies and findings of this project is currently a pre-print submitted to the *Journal of Chemical Theory and Computation (JCTC), ACS*. 
-
 You can access the pre-print at the following link:
 
 [Enhancing Protein Analysis via Transfer Learning with Graph Neural Networks](https://arxiv.org/)
 
 To cite our pre-print in your work, please use the following citation format:
 
-Wozniak, S., Janson, G., & Feig, M. (2024). Enhancing Protein Analysis via Transfer Learning with Graph Neural Networks. *Preprint submitted to the Journal of Chemical Theory and Computation, ACS*. https://arxiv.org/
+Wozniak, S., Janson, G., & Feig, M. (2024). Enhancing Protein Analysis via Transfer Learning with Graph Neural Networks. *Preprint available on arXiv*. https://arxiv.org/
 
 ## Table of Contents
 
