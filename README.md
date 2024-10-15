@@ -27,9 +27,9 @@ Wozniak, S., Janson, G., & Feig, M. (2024). Enhancing Protein Analysis via Trans
 
 - [Directory Structure](#directory-structure)
 - [Installation](#installation)
+- [Making Predictions](#making-predictions)
 - [Pretrained Models](#pretrained-models)
 - [Generating Embeddings](#generating-embeddings)
-- [Making Predictions](#making-predictions)
 - [Generating Datasets](#generating-datasets)
 - [Implementing our Networks](#implementing-our-networks)
 - [Contributing](#contributing)
@@ -86,53 +86,6 @@ Before you can run the models and use the codebase, you need to set up your envi
      source venv/bin/activate  # On Windows use `venv\Scripts\activate`
      ```
 
-## Pretrained Models
-
-`...`
-
-## Generating Embeddings
-
-### Overview
-
-This section describes how to generate embeddings for all PDB files within a specified directory. Embeddings are crucial for downstream prediction tasks and are saved for subsequent use.
-
-### Steps to Generate Embeddings
-
-1. **Prepare your environment:**
- Ensure you have followed the installation instructions to set up your environment correctly. This includes having the necessary Python packages installed and the environment activated.
-
-2. **Obtain the model:**
- Currently, you will need to manually download our pre-trained model `pka_from_sasa_res.pt` from the provided link (link to be added). Place this model in an appropriate directory accessible to your script.
-
-3. **Run the script:**
- Navigate to the `src/` directory in your terminal. Use the following command to generate embeddings:
- ```
- python embed.py <path_to_PDB_files> <output_path_for_embeddings>
- ```
- Replace `<path_to_PDB_files>` with the directory containing your PDB files and `<output_path_for_embeddings>` with the directory where you want to save the embeddings.
-
-### Example Command
-
-```
-python embed.py /path/to/pdb /path/to/output
-```
-
-This command processes all PDB files in `/path/to/pdb` and saves the resulting embeddings in `/path/to/output`.
-
-### Troubleshooting
-
-- Ensure that the paths provided are correct and accessible.
-- Verify that the pre-trained model file is in the correct directory and properly named.
-- Check your Python environment if you encounter dependencies errors.
-- If the script fails with a CUDA error and you are running on a GPU, ensure that your device has sufficient memory and is compatible.
-
-### Notes
-
-- The script utilizes multiprocessing to expedite the embedding process. Ensure your system has adequate resources to handle multiple processes simultaneously.
-- The embedding process is sensitive to the structure and quality of the input PDB files. Ensure that the files are correctly formatted and contain all necessary information.
-
-This method of generating embeddings is integral to leveraging the predictive power of our GNN models for analyzing protein structures.
-
 ## Making Predictions
 
 ### Overview
@@ -150,8 +103,6 @@ This section explains how to use our models to make predictions on protein prope
  python predict.py --option <path_to_pdb_file>
  ```
  Replace `--option` with either `--pka`, `--sasa`, or no option for default predictions.
-
-### Making Predictions
 
 #### pKa Prediction
 - **pKa value prediction:**
@@ -217,6 +168,53 @@ python predict.py --sasa pdb_file.pdb
 - Remember to use the cleaning options if your PDB files might contain non-standard residues or formats.
 
 These methods allow for the flexible application of our models to a variety of prediction tasks in protein analysis.
+
+## Pretrained Models
+
+`...`
+
+## Generating Embeddings
+
+### Overview
+
+This section describes how to generate embeddings for all PDB files within a specified directory. Embeddings are crucial for downstream prediction tasks and are saved for subsequent use.
+
+### Steps to Generate Embeddings
+
+1. **Prepare your environment:**
+ Ensure you have followed the installation instructions to set up your environment correctly. This includes having the necessary Python packages installed and the environment activated.
+
+2. **Obtain the model:**
+ Currently, you will need to manually download our pre-trained model `pka_from_sasa_res.pt` from the provided link (link to be added). Place this model in an appropriate directory accessible to your script.
+
+3. **Run the script:**
+ Navigate to the `src/` directory in your terminal. Use the following command to generate embeddings:
+ ```
+ python embed.py <path_to_PDB_files> <output_path_for_embeddings>
+ ```
+ Replace `<path_to_PDB_files>` with the directory containing your PDB files and `<output_path_for_embeddings>` with the directory where you want to save the embeddings.
+
+### Example Command
+
+```
+python embed.py /path/to/pdb /path/to/output
+```
+
+This command processes all PDB files in `/path/to/pdb` and saves the resulting embeddings in `/path/to/output`.
+
+### Troubleshooting
+
+- Ensure that the paths provided are correct and accessible.
+- Verify that the pre-trained model file is in the correct directory and properly named.
+- Check your Python environment if you encounter dependencies errors.
+- If the script fails with a CUDA error and you are running on a GPU, ensure that your device has sufficient memory and is compatible.
+
+### Notes
+
+- The script utilizes multiprocessing to expedite the embedding process. Ensure your system has adequate resources to handle multiple processes simultaneously.
+- The embedding process is sensitive to the structure and quality of the input PDB files. Ensure that the files are correctly formatted and contain all necessary information.
+
+This method of generating embeddings is integral to leveraging the predictive power of our GNN models for analyzing protein structures.
 
 ## Generating Datasets
 
