@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Neural network architectures used in our project
+# # Neural network architectures used in our project
 #
 # ------------------------------------------------------------------------------
 # Citation Information
 # ------------------------------------------------------------------------------
-# Author: Spencer Wozniak
-# Email: woznia79@msu.edu
-# Paper Title: "Title of Your Research Paper"
-# Published in: Journal Name, Volume, Page Numbers, Year
+# Authors: Spencer Wozniak, Giacomo Janson, Michael Feig
+# Emails: spencerwozniak@gmail.com, mfeiglab@gmail.com
+# Paper Title: "Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning"
 # DOI: https://doi.org/xxxxxxxx
-# GitHub: https://github.com/yourusername/your-repository
+# GitHub: https://github.com/feiglab/hydropro_ml
 #
 # Please cite the above paper if you use this code in your research.
 # ------------------------------------------------------------------------------
@@ -51,10 +50,9 @@ from torch_geometric.nn import MessagePassing, TransformerConv
 from torch_geometric.nn import radius_graph
 from torch_geometric.typing import Adj, Size, OptTensor, Tensor
 
-
 class Net(nn.Module):
     """
-    GNN architecture for GSnet. 
+    GNN architecture for GSnet.
     (with various configuration options for embeddings, layers, and output processing.)
 
     Parameters
@@ -517,20 +515,17 @@ class Net(nn.Module):
         n = # of residues
         d = hidden_channels
         ----------
-        pos      : (n,3) matrix
-        h        : (n,d) matrix
+        pos      : (n,3) matrix containing Cartesian coordinates of atoms
+        h        : (n,d) matrix with embeddings passed from .forward() method
         batch    : (optional) Used for batching
-        resid    : (optional) Used for residue-level prediction (e.g. pKa)
+        resid    : (optional) Mask that defines residue of interest
         """
-
-        #edge_index = radius_graph(pos, r=self.cutoff, batch=batch, loop=True,
-        #                          max_num_neighbors=self.max_num_neighbors,
-        #                          flow="source_to_target")
-
+        # Create edge indices using radius graph based on positions
         edge_index = radius_graph(pos, r=self.cutoff, batch=batch,
                                   max_num_neighbors=self.max_num_neighbors)
-
+        # Extract row and column indices from edge_index
         row, col = edge_index
+        # Calculate the Euclidean distance between nodes
         dists = (pos[row] - pos[col]).norm(dim=-1)
 
         if not self.bond_edges:
@@ -706,7 +701,8 @@ class Net(nn.Module):
 
 class Net_atomic(torch.nn.Module):
     """
-    GNN architecture for AtomicGNN.
+    GNN architecture for a-GSnet.
+    (Highly similar to GSnet)
 
     Parameters
     ----------
@@ -905,7 +901,8 @@ class Net_atomic(torch.nn.Module):
 
     def forward(self, pos, a, atom, charge, resid_atomic=None, resid_ca=None, batch=None):
         """
-        Handles embeddings of nodes. Passes pos, embeddings to self._forward() as (n,3), (n,d) matrices, respectively.
+        Handles embeddings of nodes. 
+        Passes pos, embeddings to self._forward() as (n,3), (n,d) matrices, respectively.
 
         Parameters
         ----------
@@ -920,6 +917,10 @@ class Net_atomic(torch.nn.Module):
         assert a.dim() == 1 and a.dtype == torch.long
         assert atom.dim() == 1 and atom.dtype == torch.long
         batch = torch.zeros_like(a) if batch is None else batch
+
+
+        if len(charge.shape) == 1:
+            charge = charge.unsqueeze(1)
 
         # Embed individual node feats
         i = self.embedding_aa(a)
@@ -940,24 +941,30 @@ class Net_atomic(torch.nn.Module):
 
     def _forward(self, pos, h, batch=None, resid_atomic=None, resid_ca=None, input_feats=None):
         """
-        Takes embedded inputs and operates via GNN layers + linear layers -> (out_channels) matrix.
+        Passes embedded inputs to the GNN -> MLP to produce (out_channels) matrix.
 
         Parameters
         ----------
-        pos          : (n,3) matrix
-        h            : (n,d) matrix
+        pos          : (n,3) matrix containing Cartesian coordinates of atoms
+        h            : (n,d) matrix with embeddings passed from .forward() method
+        resid_atomic : (optional) Mask that defines atoms in residue of interest. 
+        resid_ca     : (optional) Mask that defines alpha-carbon in residue of interest
         batch        : (optional) Used for batching
-        resid_atomic : (optional) Used for residue-level prediction
-        resid_ca     : (optional) Used for residue-level prediction
         """
+        # Create edge indices using radius graph based on positions
         edge_index = radius_graph(pos, r=self.edge_cutoff, batch=batch, max_num_neighbors=self.max_num_neighbors)
+        # Extract row and column indices from edge_index
         row, col = edge_index
+        # Calculate the Euclidean distance between nodes
         dists = (pos[row] - pos[col]).norm(dim=-1)
-
+        # Set the edge weight to the calculated distances
         edge_weight = dists
+        # Expand the distances using a Gaussian expansion function to create edge attributes.
         edge_attr = self.distance_expansion(dists).to(self.param.device)
 
+        # Loop through each layer of the GNN.
         for i, interaction in enumerate(self.interactions):
+            # Residual connection pattern
             h = h + interaction(h, edge_index, edge_weight, edge_attr)
 
         if self.fc_opt == 0:
@@ -965,6 +972,7 @@ class Net_atomic(torch.nn.Module):
         elif self.fc_opt == 1 and resid_atomic is not None and resid_ca is not None:
             h_global = scatter(h, batch, dim=0, reduce=self.readout)
             h = torch.cat([h[resid_ca], h[resid_atomic].mean(0).reshape(1, -1), h_global], dim=1)
+            #print(h.shape)
         elif self.fc_opt == 2 and resid_atomic is not None:
             h = h[resid_atomic].mean(0).reshape(1, -1)
         elif self.fc_opt == 3 and resid_ca is not None:
@@ -993,8 +1001,6 @@ class Net_atomic(torch.nn.Module):
                 f'sele_cutoff={self.sele_cutoff}, '
                 f'out_channels={self.out_channels})')
 
-
-
 class MLP(nn.Module):
     """
     Multilayer Perceptron (MLP) with multiple linear layers and activation functions.
@@ -1014,9 +1020,6 @@ class MLP(nn.Module):
 
     Methods
     -------
-    __init__(self, in_channels: int = 2560, num_linear: int = 6, linear_channels: int = 1024, dropout: float = 0.2, out_channels: int = 1)
-        Initializes the FC class with the given parameters.
-
     reset_parameters(self)
         Resets parameters of the network.
 
@@ -1101,7 +1104,6 @@ class FC(MLP):
     (Alias for 'MLP' class)
     """
     pass
-
 
 class MoE(nn.Module):
     """
@@ -1296,6 +1298,7 @@ def map_a_tensor(input_tensor):
 def radius(x, y, r, batch_x=None, batch_y=None, max_num_neighbors=32, batch_size=None):
     """
     Custom 'radius' implementation to find neighbor pairs within a specified radius.
+    (Needed to prevent)
 
     Parameters
     ----------
@@ -1408,17 +1411,17 @@ def radius_graph(x, r, batch=None, loop=False, max_num_neighbors=32, flow='sourc
 class ResidualBlock(nn.Module):
     """
     Residual GNN block.
-    
+
     This class defines a residual block for a Graph Neural Network (GNN).
     It includes a layer normalization step followed by a ReLU activation.
-    
+
     Parameters
     ----------
     block : nn.Module
         The neural network block to apply within the residual block.
     dim : int
         The dimension of the input and output features.
-    
+
     Methods
     -------
     reset_parameters():
@@ -1472,7 +1475,7 @@ class ResidualBlock(nn.Module):
                 f'block={self.block}, '
                 f'layernorm={self.layernorm}, '
                 f'act={self.act}) ')
-        
+
 
 class InteractionBlock(nn.Module):
     """
@@ -1624,11 +1627,11 @@ class CustomInteractionBlock(nn.Module):
             Updated node features.
         """
         e = self.mlp(edge_attr)
-        
+
         x = self.conv(x, edge_index, e)
         x = self.act(x)
         x = self.lin(x)
-        
+
         return x
 
 
@@ -2021,7 +2024,7 @@ class ShiftedSoftplus(torch.nn.Module):
 
 
 def main():
-    
+
     model1 = Net(
         embedding_only    = True,
         use_transfer      = True,
@@ -2055,7 +2058,7 @@ def main():
     model2 = Net_atomic(
         embedding_only    = True,
         fc_opt            = 1,      # Option for GNN -> FC “FCopt{N}”
-        hidden_channels   = 150,    # Number of hidden dimensions -> “{N}channels”
+        hidden_channels   = 75,    # Number of hidden dimensions -> “{N}channels”
         num_filters       = 150,    # Number of convolutional filters -> “{N}filters”
         num_interactions  = 3,      # Number of layers -> “{N}layers”
         num_gaussians     = 300,    # Number of gaussians for distance expansion
@@ -2071,7 +2074,7 @@ def main():
         mlp_activation    = 'relu', # Activation function used in MLP embeddings
         heads             = 6,      # Number of transformer attention heads “{N}heads”
         advanced_residual = True,   # Create residual connections?
-        one_hot_res       = False,  # Append one-hot residue encoding to FC? 
+        one_hot_res       = False,  # Append one-hot residue encoding to FC?
     )
 
     model3 = FC(
@@ -2079,26 +2082,20 @@ def main():
         num_linear       = 6,
         linear_channels  = 1024,
         dropout          = 0.2,
-        out_channels     = 1,   
-    )
-
-    model4 = MoE(
-        num_experts      = 12,
-        feature_dim      = 150,
-        num_linear       = 6,
-        linear_channels  = 1024,
-        dropout          = 0.2,
         out_channels     = 1,
-        moe_method       = 'cat',
     )
 
-    model = model3
+    for model in (model1, model2, model3):
+        print(model)
 
-    total = sum(p.numel() for p in model.parameters())
-    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        total = sum(p.numel() for p in model.parameters())
+        trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-    print(f'{total} total parameters.')
-    print(f'{trainable} trainable parameters.')
+        print(f'{total} total parameters.')
+        print(f'{trainable} trainable parameters.')
 
 if __name__ == '__main__':
     main()
+
+
+
