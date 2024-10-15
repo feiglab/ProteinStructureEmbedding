@@ -1,4 +1,3 @@
-
 # Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning
 
 ## Overview
@@ -24,11 +23,11 @@ Properties that these models can predict include:
 
 You can access the pre-print at the following link:
 
-[Enhancing Protein Analysis via Transfer Learning with Graph Neural Networks](https://arxiv.org/)
+[Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning](https://arxiv.org/)
 
-To cite our pre-print in your work, please use the following citation format:
+To cite our pre-print in your work, use:
 
-Wozniak, S., Janson, G., & Feig, M. (2024). Enhancing Protein Analysis via Transfer Learning with Graph Neural Networks. *Preprint available on arXiv*. https://arxiv.org/
+Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning. *Preprint available on arXiv*. https://arxiv.org/
 
 ## Table of Contents
 
