@@ -7,7 +7,9 @@ This document offers an overview of the project, installation steps, and instruc
 
 ### Graph Neural Network-Based Prediction
 
-This project leverages Graph Neural Networks (GNNs) to accelerate the computational prediction of protein properties. Our model, the `Global Structure Embedding Network (GSnet)`, is adept at predicting a variety of physicochemical properties from three-dimensional protein structures. These properties include:
+This project leverages Graph Neural Networks (GNNs) to accelerate the computational prediction of protein properties. Our model, the `Global Structure Embedding Network (GSnet)`, is adept at predicting a variety of physicochemical properties from three-dimensional protein structures. 
+
+These properties include:
 
 - Free energy of solvation ($\Delta G_{sol}$)
 - Hydrodynamic radius ($R_h$)
