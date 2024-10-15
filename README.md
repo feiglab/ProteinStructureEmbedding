@@ -1,5 +1,5 @@
 
-# Enhancing Protein Analysis via Transfer Learning with Graph Neural Networks
+# Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning
 
 ## Overview
 
