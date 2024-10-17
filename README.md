@@ -193,7 +193,7 @@ These methods allow for the flexible application of our models to a variety of p
 
 For a full description of the utility of the `predict.py` script, you can run `python predict.py -h` or `python predict.py --help`:
 
-```
+```bash
 usage: predict.py [-h] [--clean] [--pka] [--atomic] [--multi] [--sasa]
                   [--shift] [--chain chain] [--combine-chains] [--keep]
                   [--cpu] [--gpu] [--numpy] [--time] [--skip-bad-files]
