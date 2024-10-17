@@ -64,8 +64,7 @@ hydropro_ml/
 |   ├── dataset.py          # Classes for processing PDBs and generating datasets
 |   ├── net.py              # Neural network architectures used in our project
 |   ├── embed.py            # Script that generates embeddings.
-|   ├── predict.py          # Script that makes predictions.
-|   └── evaluate.py         # Script for evaluating model performance.
+|   └── predict.py          # Script for making predictions.
 |
 ├── models/             # State dictionaries containing weights and biases of the models
 |   |
@@ -168,7 +167,7 @@ python predict.py /path/to/pdb_file.pdb
 - **Sample Output:**
 ```
 ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
--27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       /path/to/pdb_file.pdb
+-2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 /path/to/pdb_file.pdb
 ```
 
 #### Solvent-Accessible Surface Area (SASA) Prediction
@@ -179,7 +178,7 @@ python predict.py --sasa /path/to/pdb_file.pdb
 - **Sample Output:**
 ```
 ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE
--27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       57.129E       /path/to/pdb_file.pdb
+-2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 2.3868515E+02 /path/to/pdb_file.pdb
 ```
 
 ### Troubleshooting
