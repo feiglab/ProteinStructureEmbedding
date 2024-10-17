@@ -2044,9 +2044,10 @@ def main():
           gnn_layer         = 'transformerconv',    # 'cfconv', 'transformerconv', 'egnn'
           heads             = 1,         # Heads (for transformerconv)
           mlp_activation    = 'relu',    # MLP Embedding Activation (relu, leakyrelu, ssp)
-          standardize_cc    = True,      # Standardize CA-COFM distances?             layernorm         = False,     # Layer normalization?
+          standardize_cc    = True,      # Standardize CA-COFM distances?             
+          layernorm         = False,     # Layer normalization?
           advanced_residual = True,     # More advanced residual?
-          bond_edges        = False      # Add edge weight for bonded edges?          )
+          bond_edges        = False      # Add edge weight for bonded edges?
     )
     
     # Parameters used for fine-tuning on molecular SASA
@@ -2070,9 +2071,10 @@ def main():
           gnn_layer         = 'transformerconv',    # 'cfconv', 'transformerconv', 'egnn'
           heads             = 1,         # Heads (for transformerconv)
           mlp_activation    = 'relu',    # MLP Embedding Activation (relu, leakyrelu, ssp)
-          standardize_cc    = True,      # Standardize CA-COFM distances?             layernorm         = False,     # Layer normalization?
+          standardize_cc    = True,      # Standardize CA-COFM distances?             
+          layernorm         = False,     # Layer normalization?
           advanced_residual = True,     # More advanced residual?
-          bond_edges        = False      # Add edge weight for bonded edges?          )
+          bond_edges        = False      # Add edge weight for bonded edges?          
     )
     
     # Parameters used for fine-tuning on pKa
