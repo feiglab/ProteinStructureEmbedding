@@ -42,8 +42,8 @@ Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Pr
 - [Making Predictions](#making-predictions)
 - [Pretrained Models](#pretrained-models)
 - [Generating Embeddings](#generating-embeddings)
-- [Generating Datasets](#generating-datasets)
 - [Implementing our Networks](#implementing-our-networks)
+- [Generating Datasets](#generating-datasets)
 - [To do](#to-do)
 
 ## Directory Structure
@@ -278,13 +278,120 @@ This command processes all PDB files in `/path/to/pdb` and saves the resulting e
 
 This method of generating embeddings is integral to leveraging the predictive power of our GNN models for analyzing protein structures.
 
+## Implementing our Networks
+
+If you would prefer to manually implement the networks, you can follow these steps to get started.
+
+### Implementing Global GSnet
+
+1. Load the model
+
+```python
+from net import Net
+
+# Initialize the model with the correct parameters
+model = Net(
+          hidden_channels   = 150,       # Number of hidden dimensions
+          num_filters       = 150,       # Number of convolutional filters
+          num_interactions  = 6,         # Number of GNN layers
+          num_gaussians     = 300,       # Number of Gaussians
+          cutoff            = 15.0,      # Cutoff (Å) for edges
+          max_num_neighbors = 150,       # Max. edges per node # 150
+          readout           = 'mean',    # Pooling method
+          out_channels      = 1,         # Number of outputs (custom implementation)
+          dropout           = 0.2,       # Dropout (Zero for no dropout)
+          num_linear        = 4,         # Number of linear layers
+          linear_channels   = 1024,      # Linear channels
+          activation        = 'ssp',     # Linear activation
+          cc_embedding      = 'rbf',     # CA-COFM Distance Embedding ('mlp', 'rbf')
+          heads             = 1,         # Heads (for transformerconv)
+          mlp_activation    = 'relu',    # MLP Embedding Activation (relu, leakyrelu, ssp)
+          standardize_cc    = True,      # Standardize CA-COFM distances?
+          advanced_residual = True,      # Create residual connections?
+        )
+```
+
+2. Load model weights (if needed)
+3. Run a forward pass
+
+### Implementing Residue GSnet
+
+1. Load the model
+
+```python
+from net import Net
+
+# Initialize the model with the correct parameters
+model = Net(
+          use_transfer      = True,
+          out_channels_t    = 1,
+          residue_pred      = True,
+          global_mean       = True,
+          env_thresh        = [6,8,10,12,15],
+          env_mlp           = False,
+          one_hot_res       = True,
+          hidden_channels   = 150,
+          num_filters       = 150,
+          num_interactions  = 6,
+          num_gaussians     = 300,
+          cutoff            = 15.0,
+          max_num_neighbors = 64,
+          readout           = 'mean',
+          out_channels      = 1,
+          dropout           = 0.2,
+          num_linear        = 6,
+          linear_channels   = 1024,
+          activation        = 'ssp',
+          cc_embedding      = 'rbf',
+          heads             = 1,
+          advanced_residual = True,
+        )
+```
+
+2. Load model weights (if needed)
+3. Run a forward pass
+
+### Implementing a-GSnet
+
+1. Load the model
+
+```python
+from net import Net_atomic
+
+# Initialize the model with the correct parameters
+model = Net(
+          fc_opt            = 1,      # Option for GNN -> FC “FCopt{N}”
+          hidden_channels   = 75,     # Number of hidden dimensions -> “{N}channels”
+          num_filters       = 150,    # Number of convolutional filters -> “{N}filters”
+          num_interactions  = 3,      # Number of layers -> “{N}layers”
+          num_gaussians     = 300,    # Number of gaussians for distance expansion
+          sele_cutoff       = 10.0,   # Selection cutoff
+          edge_cutoff       = 5.0,    # Radius graph cutoff -> “{X}edgecutoff”
+          max_num_neighbors = 150,    # Maximum edges per node
+          readout           = 'mean', # Read out the mean
+          out_channels      = 1,      # Number of outcomes (1 for pKa)
+          dropout           = 0.2,    # Dropout rate
+          num_linear        = 6,      # Number of linear layers in FC -> “{N}lin”
+          linear_channels   = 1024,   # Number of hidden linear dims -> “{N}FCch
+          activation        = 'ssp',  # Activation function used in FC layers
+          mlp_activation    = 'relu', # Activation function used in MLP embeddings
+          heads             = 3,      # Number of transformer attention heads “{N}heads”
+          advanced_residual = True,   # Create residual connections?
+        )
+```
+
+2. Load model weights (if needed)
+3. Run a forward pass
+
+### More info
+
+For more info, see the source code for the networks in `net.py`.
+
 ## Generating Datasets
 
 `...`
 
-## Implementing our Networks
 
-`...`
 
 ## To do
 
