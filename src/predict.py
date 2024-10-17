@@ -230,7 +230,7 @@ def load_models(args, device):
         models['6'].load_state_dict(fc_elements)
     else:
         models['gnn'] = Net()
-        models['gnn'].load_state_dict(torch.load(f'{model_dir}/transformer_default.pt', map_location=device), strict=False)
+        models['gnn'].load_state_dict(torch.load(f'{model_dir}/GSnet_default.pt', map_location=device), strict=False)
 
     # Set models to evaluation mode and move to device
     for key in models.keys():
@@ -467,6 +467,8 @@ def predict(rep, models, avg, std, args, device):
                     if not args.atomic:
                         idx = torch.tensor(rep.resSeq_to_resid(resSeq, mask=True))
 
+                        if args.time:
+                            t0 = perf_counter()
                         with torch.no_grad():
                             pred = models['gnn'](pos, 
                                                  a, 
@@ -474,16 +476,34 @@ def predict(rep, models, avg, std, args, device):
                                                  dh, 
                                                  resid=idx)
 
+                        if args.time:
+                            t1 = perf_counter()
+                            print(f'FORWARD PASS: {t1-t0} s')
                     else:
                         pqr = '.'.join([frag for frag in rep.pdb.split('.')[:-1] + ['pqr']])
                        
                         if not os.path.isfile(pqr):
+                            if args.time:
+                                t0 = perf_counter()
+                            
                             sub.run(
                                 f'pdb2pqr30 --ff CHARMM {rep.pdb} {pqr}', shell=True,
                                 stderr=sub.DEVNULL, stdout=sub.DEVNULL
                             )
+
+                            if args.time:
+                                t1 = perf_counter()
+                                print(f'PDB2PQR: {t1-t0} s')
                         
-                        atomic_rep = NumpyRep_atomic(pqr,resSeq)
+                        if args.time:
+                            t0 = perf_counter()
+                        atomic_rep = NumpyRep_atomic(pqr,resSeq) 
+                        if args.time:
+                            t1 = perf_counter()
+                            print(f'CREATE ATOMIC REPRESENTATION: {t1-t0} s')
+
+                        if args.time:
+                            t0 = perf_counter()
                         with torch.no_grad():
                             pred = models['gnn'](torch.tensor(atomic_rep.x, dtype=torch.float).to(device),
                                                  torch.tensor(atomic_rep.a, dtype=torch.long).to(device),
@@ -492,6 +512,9 @@ def predict(rep, models, avg, std, args, device):
                                                  resid_ca=torch.tensor(atomic_rep.resid_ca).to(device),
                                                  resid_atomic=torch.tensor(atomic_rep.resid_atomic).to(device))
 
+                        if args.time:
+                            t1 = perf_counter()
+                            print(f'FORWARD PASS: {t1-t0} s')
                     pred = pred.cpu().detach().numpy()[0][0] * std + avg
 
                     if not args.shift:
