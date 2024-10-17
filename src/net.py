@@ -2025,67 +2025,110 @@ class ShiftedSoftplus(torch.nn.Module):
 
 def main():
 
+    # Parameters used for original network training
     model1 = Net(
-        embedding_only    = True,
-        use_transfer      = True,
-        out_channels_t    = 1,
-        residue_pred      = True,
-        residue_pooling   = False,
-        global_mean       = True,
-        env_thresh        = [6,8,10,12,15],
-        hidden_channels   = 150,       # 64, 96, 128
-        num_filters       = 150,       # 128
-        num_interactions  = 6,         # 6
-        num_gaussians     = 300,       # 200
-        cutoff            = 15.0,      # 15.0
-        max_num_neighbors = 150,       # 32, 56, 64
-        readout           = 'mean',    # 'mean'
-        out_channels      = 6,         # Number of outputs (custom implementation)
-        dropout           = 0.2,
-        num_linear        = 6,
-        linear_channels   = 1024,
-        activation        = 'ssp',
-        cc_embedding      = 'rbf',     # 'mlp', 'rbf'
-        gnn_layer         = 'transformerconv', # 'cfconv', 'transformerconv' 'egnn'
-        heads             = 1,
-        mlp_activation    = 'relu',    # relu, leakyrelu, ssp
-        standardize_cc    = True,
-        layernorm         = False,
-        advanced_residual = True
+          use_transfer      = False,
+          hidden_channels   = 150,       # GNN Channels #150
+          num_filters       = 150,       #              #150
+          num_interactions  = 6,         # Number of GNN layers
+          num_gaussians     = 300,       # Number of Gaussians
+          cutoff            = 15.0,      # Cutoff (Å) for edges
+          max_num_neighbors = 150,       # Max. edges per node # 150
+          readout           = 'mean',    # Pooling method
+          out_channels      = 1,         # Number of outputs (custom implementation)
+          dropout           = 0.2,       # Dropout (Zero for no dropout)
+          num_linear        = 4,         # Number of linear layers
+          linear_channels   = 1024,      # Linear channels
+          activation        = 'ssp',     # Linear activation
+          cc_embedding      = 'rbf',     # CA-COFM Distance Embedding ('mlp', 'rbf')
+          gnn_layer         = 'transformerconv',    # 'cfconv', 'transformerconv', 'egnn'
+          heads             = 1,         # Heads (for transformerconv)
+          mlp_activation    = 'relu',    # MLP Embedding Activation (relu, leakyrelu, ssp)
+          standardize_cc    = True,      # Standardize CA-COFM distances?             layernorm         = False,     # Layer normalization?
+          advanced_residual = True,     # More advanced residual?
+          bond_edges        = False      # Add edge weight for bonded edges?          )
     )
-
-
-    model2 = Net_atomic(
-        embedding_only    = True,
-        fc_opt            = 1,      # Option for GNN -> FC “FCopt{N}”
-        hidden_channels   = 75,    # Number of hidden dimensions -> “{N}channels”
-        num_filters       = 150,    # Number of convolutional filters -> “{N}filters”
-        num_interactions  = 3,      # Number of layers -> “{N}layers”
-        num_gaussians     = 300,    # Number of gaussians for distance expansion
-        sele_cutoff       = 10.0,   # Selection cutoff
-        edge_cutoff       = 5.0,    # Radius graph cutoff -> “{X}edgecutoff”
-        max_num_neighbors = 150,    # Maximum edges per node
-        readout           = 'mean', # Read out the mean
-        out_channels      = 1,      # Number of outcomes (1 for pKa)
-        dropout           = 0.2,    # Dropout rate
-        num_linear        = 6,      # Number of linear layers in FC -> “{N}lin”
-        linear_channels   = 1024,   # Number of hidden linear dims -> “{N}FCch
-        activation        = 'ssp',  # Activation function used in FC layers
-        mlp_activation    = 'relu', # Activation function used in MLP embeddings
-        heads             = 6,      # Number of transformer attention heads “{N}heads”
-        advanced_residual = True,   # Create residual connections?
-        one_hot_res       = False,  # Append one-hot residue encoding to FC?
+    
+    # Parameters used for fine-tuning on molecular SASA
+    model2 = Net(
+          use_transfer      = True,
+          out_channels_t    = 1,
+          residue_pred      = False,
+          hidden_channels   = 150,       # GNN Channels #150
+          num_filters       = 150,       #              #150
+          num_interactions  = 6,         # Number of GNN layers
+          num_gaussians     = 300,       # Number of Gaussians
+          cutoff            = 15.0,      # Cutoff (Å) for edges
+          max_num_neighbors = 150,       # Max. edges per node # 150
+          readout           = 'mean',    # Pooling method
+          out_channels      = 1,         # Number of outputs (custom implementation)
+          dropout           = 0.2,       # Dropout (Zero for no dropout)
+          num_linear        = 4,         # Number of linear layers
+          linear_channels   = 1024,      # Linear channels
+          activation        = 'ssp',     # Linear activation
+          cc_embedding      = 'rbf',     # CA-COFM Distance Embedding ('mlp', 'rbf')
+          gnn_layer         = 'transformerconv',    # 'cfconv', 'transformerconv', 'egnn'
+          heads             = 1,         # Heads (for transformerconv)
+          mlp_activation    = 'relu',    # MLP Embedding Activation (relu, leakyrelu, ssp)
+          standardize_cc    = True,      # Standardize CA-COFM distances?             layernorm         = False,     # Layer normalization?
+          advanced_residual = True,     # More advanced residual?
+          bond_edges        = False      # Add edge weight for bonded edges?          )
     )
+    
+    # Parameters used for fine-tuning on pKa
+    model3 = Net(
+          use_transfer      = True,
+          out_channels_t    = 1,
+          residue_pred      = True,
+          pad_thresh        = False,
+          global_mean       = True,
+          env_thresh        = [6,8,10,12,15],
+          env_mlp           = False,
+          one_hot_res       = True,
+          include_input     = False,
+          hidden_channels   = 150,  # 64, 96, 128
+          num_filters       = 150,   # 128
+          num_interactions  = 6,         # 6
+          num_gaussians     = 300,       # 200
+          cutoff            = 15.0,      # 15.0
+          max_num_neighbors = 64,        # 32, 56, 64
+          readout           = 'mean',    # 'mean'
+          out_channels      = 1,         # Number of outputs (custom implementation)
+          dropout           = 0.2,
+          num_linear        = 6,
+          linear_channels   = 1024,
+          activation        = 'ssp',
+          cc_embedding      = 'rbf',
+          gnn_layer         = 'transformerconv',
+          heads             = 1,           # Need to set if using 'transformerconv'
+          advanced_residual = True,
+          bond_edges        = False,
+          cofactors         = False,
+         )
 
-    model3 = FC(
-        in_channels      = 150*12,
-        num_linear       = 6,
-        linear_channels  = 1024,
-        dropout          = 0.2,
-        out_channels     = 1,
+    # Parameters used for training aGSnet on pKa
+    model4 = Net_atomic(
+          fc_opt            = 1,      # Option for GNN -> FC “FCopt{N}”
+          hidden_channels   = 75,     # Number of hidden dimensions -> “{N}channels”
+          num_filters       = 150,    # Number of convolutional filters -> “{N}filters”
+          num_interactions  = 3,      # Number of layers -> “{N}layers”
+          num_gaussians     = 300,    # Number of gaussians for distance expansion
+          sele_cutoff       = 10.0,   # Selection cutoff
+          edge_cutoff       = 5.0,    # Radius graph cutoff -> “{X}edgecutoff”
+          max_num_neighbors = 150,    # Maximum edges per node
+          readout           = 'mean', # Read out the mean
+          out_channels      = 1,      # Number of outcomes (1 for pKa)
+          dropout           = 0.2,    # Dropout rate
+          num_linear        = 6,      # Number of linear layers in FC -> “{N}lin”
+          linear_channels   = 1024,   # Number of hidden linear dims -> “{N}FCch
+          activation        = 'ssp',  # Activation function used in FC layers
+          mlp_activation    = 'relu', # Activation function used in MLP embeddings
+          heads             = 3,      # Number of transformer attention heads “{N}heads”
+          advanced_residual = True,   # Create residual connections?
+          one_hot_res       = False,  # Append one-hot residue encoding to FC?
     )
-
-    for model in (model1, model2, model3):
+         
+    for model in (model1, model2, model3, model4):
         print(model)
 
         total = sum(p.numel() for p in model.parameters())
@@ -2094,8 +2137,11 @@ def main():
         print(f'{total} total parameters.')
         print(f'{trainable} trainable parameters.')
 
+
 if __name__ == '__main__':
     main()
+
+
 
 
 
