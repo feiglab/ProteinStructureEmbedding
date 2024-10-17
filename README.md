@@ -139,7 +139,6 @@ python predict.py --pka --atomic /path/to/pdb_file.pdb
 ```
 - **Sample Output:**
 ```
-...
 7.315245148533568 LYS 4 A /path/to/pdb_file.pdb
 3.9241322437930055 ASP 5 A /path/to/pdb_file.pdb
 8.401511664982062 LYS 7 A /path/to/pdb_file.pdb
@@ -156,7 +155,6 @@ python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
 ```
 - **Sample Output:**
 ```
-...
 -3.2247548514664315 LYS 4 A /path/to/pdb_file.pdb
 0.024132243793005603 ASP 5 A /path/to/pdb_file.pdb
 -2.1384883350179376 LYS 7 A /path/to/pdb_file.pdb
