@@ -275,8 +275,10 @@ class NumpyRep_atomic:
         Atom encoding of atoms within the cutoff.
     charge : np.Ndarray
         Charges (calculated via pdb2pqr) of atoms within the cutoff.
+    traj : md.Trajectory
+        Allows passage of an MDTraj Trajectory object to accelerate computation.
     """
-    def __init__(self, pdb, resSeq, cutoff=10.0):
+    def __init__(self, pdb, resSeq, cutoff=10.0, traj=None):
         """
         Parameters
         ----------
@@ -291,7 +293,11 @@ class NumpyRep_atomic:
         self.resSeq = resSeq
         self.cutoff = cutoff
         
-        self.traj = load_pdb(pdb)
+        if traj is None:
+            self.traj = load_pdb(pdb)
+        else:
+            self.traj = traj
+
         self.x = self.get_coords()
         
         self.idx_map = None

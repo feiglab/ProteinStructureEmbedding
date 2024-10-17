@@ -460,6 +460,25 @@ def predict(rep, models, avg, std, args, device):
             prot = rep.traj.top
 
             resids = []
+
+            if args.atomic:
+                pqr = '.'.join([frag for frag in rep.pdb.split('.')[:-1] + ['pqr']])
+               
+                if not os.path.isfile(pqr):
+                    if args.time:
+                        t0 = perf_counter()
+                    
+                    sub.run(
+                        f'pdb2pqr30 --ff CHARMM {rep.pdb} {pqr}', shell=True,
+                        stderr=sub.DEVNULL, stdout=sub.DEVNULL
+                    )
+
+                    if args.time:
+                        t1 = perf_counter()
+                        print(f'PDB2PQR: {t1-t0} s')
+
+            pqr_traj = md.load_pdb(pqr)
+
             for r in prot.residues:
                 if (r_3 := r.__repr__()[:3]) in standard:
                     resSeq = r.resSeq
@@ -480,24 +499,9 @@ def predict(rep, models, avg, std, args, device):
                             t1 = perf_counter()
                             print(f'FORWARD PASS: {t1-t0} s')
                     else:
-                        pqr = '.'.join([frag for frag in rep.pdb.split('.')[:-1] + ['pqr']])
-                       
-                        if not os.path.isfile(pqr):
-                            if args.time:
-                                t0 = perf_counter()
-                            
-                            sub.run(
-                                f'pdb2pqr30 --ff CHARMM {rep.pdb} {pqr}', shell=True,
-                                stderr=sub.DEVNULL, stdout=sub.DEVNULL
-                            )
-
-                            if args.time:
-                                t1 = perf_counter()
-                                print(f'PDB2PQR: {t1-t0} s')
-                        
                         if args.time:
                             t0 = perf_counter()
-                        atomic_rep = NumpyRep_atomic(pqr,resSeq) 
+                        atomic_rep = NumpyRep_atomic(pqr,resSeq,traj=pqr_traj) 
                         if args.time:
                             t1 = perf_counter()
                             print(f'CREATE ATOMIC REPRESENTATION: {t1-t0} s')
