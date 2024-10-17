@@ -185,7 +185,13 @@ These methods allow for the flexible application of our models to a variety of p
 
 ## Pretrained Models
 
-`...`
+| Model Name           | Number of Parameters | Description                                                                                     |
+|----------------------|----------------------|-------------------------------------------------------------------------------------------------|
+| `GSnet_default.pt`    | [INSERT VALUE]       | The original GSnet model trained on geometric properties and ∆Gsol using a masked loss function. |
+| `GSnet_SASA.pt`       | [INSERT VALUE]       | GSnet fine-tuned for molecular SASA predictions with the GNN parameters frozen.                  |
+| `GSnet_pKa.pt`        | [INSERT VALUE]       | GSnet fine-tuned for residue-level SASA, then further trained to predict pKa values.              |
+| `aGSnet_pKa.pt`       | [INSERT VALUE]       | aGSnet trained from scratch on PHMD549 data and fine-tuned for pKa prediction on experimental data. |
+
 
 ## Generating Embeddings
 
