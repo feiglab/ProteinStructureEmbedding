@@ -477,7 +477,7 @@ def predict(rep, models, avg, std, args, device):
                         t1 = perf_counter()
                         print(f'PDB2PQR: {t1-t0} s')
 
-            pqr_traj = md.load_pdb(pqr)
+                pqr_traj = md.load_pdb(pqr)
 
             for r in prot.residues:
                 if (r_3 := r.__repr__()[:3]) in standard:
