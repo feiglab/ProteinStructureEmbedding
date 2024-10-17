@@ -111,14 +111,14 @@ This section explains how to use our models to make predictions on protein prope
 
 2. **Run the prediction script:**
  Use the command below, substituting `<path_to_pdb_file>` with your PDB file's path:
- ```
+ ```bash
  python predict.py --option <path_to_pdb_file>
  ```
  Replace `--option` with either `--pka`, `--sasa`, or no option for default predictions.
 
 #### pKa Prediction
 - **pKa value prediction:**
-```
+```bash
 python predict.py --pka pdb_file.pdb
 ```
 - **Sample Output:**
@@ -131,7 +131,7 @@ python predict.py --pka pdb_file.pdb
 ...
 ```
 - **pKa shift prediction:**
-```
+```bash
 python predict.py --pka --shift pdb_file.pdb
 ```
 - **Sample Output:**
@@ -146,7 +146,7 @@ python predict.py --pka --shift pdb_file.pdb
 
 #### Default Physicochemical Properties Prediction
 - **Command:**
-```
+```bash
 python predict.py pdb_file.pdb
 ```
 - **Sample Output:**
@@ -157,7 +157,7 @@ python predict.py pdb_file.pdb
 
 #### Solvent-Accessible Surface Area (SASA) Prediction
 - **Command:**
-```
+```bash
 python predict.py --sasa pdb_file.pdb
 ```
 - **Sample Output:**
@@ -207,14 +207,14 @@ This section describes how to generate embeddings for all PDB files within a spe
 
 3. **Run the script:**
  Navigate to the `src/` directory in your terminal. Use the following command to generate embeddings:
- ```
+ ```bash
  python embed.py <path_to_PDB_files> <output_path_for_embeddings>
  ```
  Replace `<path_to_PDB_files>` with the directory containing your PDB files and `<output_path_for_embeddings>` with the directory where you want to save the embeddings.
 
 ### Example Command
 
-```
+```bash
 python embed.py /path/to/pdb /path/to/output
 ```
 
