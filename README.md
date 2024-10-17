@@ -187,8 +187,8 @@ These methods allow for the flexible application of our models to a variety of p
 
 | Model Name           | Number of Parameters | Description                                                                                     |
 |----------------------|----------------------|-------------------------------------------------------------------------------------------------|
-| `GSnet_default.pt`    | 5,971,748       | The original GSnet model trained on geometric properties and ∆Gsol using a masked loss function. |
-| `GSnet_SASA.pt`       | 5,971,748       | GSnet fine-tuned for molecular SASA predictions with the GNN parameters frozen.                  |
+| `GSnet_default.pt`    | 5,971,748       | The original GSnet model trained on the 6 physicochemical properties. |
+| `GSnet_SASA.pt`       | 5,971,748       | GSnet fine-tuned for molecular SASA predictions.                  |
 | `GSnet_pKa.pt`        | 11,210,392       | GSnet fine-tuned for residue-level SASA, then further trained to predict pKa values.              |
 | `aGSnet_pKa.pt`       | 4,784,324       | aGSnet trained from scratch on PHMD549 data and fine-tuned for pKa prediction on experimental data. |
 
