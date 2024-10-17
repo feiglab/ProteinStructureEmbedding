@@ -1,0 +1,10 @@
+numpy
+torch
+torch-geometric
+torch-scatter
+torch-cluster
+matplotlib
+scipy
+mdtraj
+einops
+biopython

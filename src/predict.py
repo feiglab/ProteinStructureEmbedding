@@ -30,7 +30,6 @@ import sys
 import warnings
 import subprocess as sub
 from collections import OrderedDict
-from cprint import *
 from Bio import PDB
 from time import perf_counter
 #warnings.filterwarnings('ignore')
