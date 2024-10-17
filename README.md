@@ -115,55 +115,65 @@ This section explains how to use our models to make predictions on protein prope
  python predict.py --option <path_to_pdb_file>
  ```
  Replace `--option` with either `--pka`, `--sasa`, or no option for default predictions.
+ 
+ 
 
 #### pKa Prediction
 - **pKa value prediction:**
 ```bash
-python predict.py --pka pdb_file.pdb
+python predict.py --pka /path/to/pdb_file.pdb
+```
+Note that `GSnet` is the default option. pKa predictions are more accurate with `a-GSnet`. To use `a-GSnet`, you must use the option `--atomic`.
+```bash
+python predict.py --pka --atomic /path/to/pdb_file.pdb
 ```
 - **Sample Output:**
 ```
 ...
-7.315245148533568 LYS 4 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
-3.9241322437930055 ASP 5 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
-8.401511664982062 LYS 7 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
-3.903559068776328 ASP 11 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+7.315245148533568 LYS 4 A /path/to/pdb_file.pdb
+3.9241322437930055 ASP 5 A /path/to/pdb_file.pdb
+8.401511664982062 LYS 7 A /path/to/pdb_file.pdb
+3.903559068776328 ASP 11 A /path/to/pdb_file.pdb
 ...
 ```
 - **pKa shift prediction:**
 ```bash
-python predict.py --pka --shift pdb_file.pdb
+python predict.py --pka --shift /path/to/pdb_file.pdb
+```
+or
+```bash
+python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
 ```
 - **Sample Output:**
 ```
 ...
--3.2247548514664315 LYS 4 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
-0.024132243793005603 ASP 5 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
--2.1384883350179376 LYS 7 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
-0.003559068776328278 ASP 11 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+-3.2247548514664315 LYS 4 A /path/to/pdb_file.pdb
+0.024132243793005603 ASP 5 A /path/to/pdb_file.pdb
+-2.1384883350179376 LYS 7 A /path/to/pdb_file.pdb
+0.003559068776328278 ASP 11 A /path/to/pdb_file.pdb
 ...
 ```
 
 #### Default Physicochemical Properties Prediction
 - **Command:**
 ```bash
-python predict.py pdb_file.pdb
+python predict.py /path/to/pdb_file.pdb
 ```
 - **Sample Output:**
 ```
 ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
--27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       pdb_file.pdb
+-27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       /path/to/pdb_file.pdb
 ```
 
 #### Solvent-Accessible Surface Area (SASA) Prediction
 - **Command:**
 ```bash
-python predict.py --sasa pdb_file.pdb
+python predict.py --sasa /path/to/pdb_file.pdb
 ```
 - **Sample Output:**
 ```
 ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE
--27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       57.129E       pdb_file.pdb
+-27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       57.129E       /path/to/pdb_file.pdb
 ```
 
 ### Troubleshooting
