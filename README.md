@@ -199,9 +199,8 @@ These methods allow for the flexible application of our models to a variety of p
 For a full description of the utility of the `predict.py` script, you can run `python predict.py -h` or `python predict.py --help`:
 
 ```
-usage: predict.py [-h] [--clean] [--pka] [--atomic] [--multi] [--sasa]
-                  [--shift] [--chain chain] [--combine-chains] [--keep]
-                  [--cpu] [--gpu] [--numpy] [--time] [--skip-bad-files]
+usage: predict.py [-h] [--clean] [--pka] [--atomic] [--sasa] [--shift] [--chain chain] [--combine-chains] [--keep] [--cpu] [--gpu] [--numpy] [--time]
+                  [--skip-bad-files]
                   pdbs [pdbs ...]
 
 ML prediction on PDB files
@@ -214,13 +213,10 @@ optional arguments:
   --clean           Clean PDB files before making predictions.
   --pka             Predict pKa.
   --atomic          Use a-GSnet for pKa predictions
-  --multi           Use multiple models to predict pKa on a per-residue
-                    basis.
   --sasa            Predict SASA.
   --shift           Calculate pKa shift (relative to standard value).
   --chain chain     Specify chain.
-  --combine-chains  Make calculation for structure of all chains in a PDB
-                    file.
+  --combine-chains  Make calculation for structure of all chains in a PDB file.
   --keep            Keep cleaned PDB files.
   --cpu             Run on CPU.
   --gpu             Run on GPU.
