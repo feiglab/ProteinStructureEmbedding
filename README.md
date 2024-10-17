@@ -51,17 +51,25 @@ hydropro_ml/
 │
 ├── datasets/           # Our datasets.
 |   |
-|   ├── train.0.csv     # Our training dataset.
-|   ├── val.0.csv       # Our validation dataset.
-|   └── test.0.csv      # Our test dataset.
+|   ├── train.0.csv         # Our training dataset.
+|   ├── val.0.csv           # Our validation dataset.
+|   └── test.0.csv          # Our test dataset.
 |
 ├── src/                # Source code of our application.
 |   |
-|   ├── dataset.py      # Classes for processing PDBs and generating datasets
-|   ├── net.py          # Neural network architectures used in our project
-|   ├── embed.py        # Script that generates embeddings.
-|   ├── predict.py      # Script that makes predictions.
-|   └── evaluate.py     # Script for evaluating model performance.
+|   ├── dataset.py          # Classes for processing PDBs and generating datasets
+|   ├── net.py              # Neural network architectures used in our project
+|   ├── embed.py            # Script that generates embeddings.
+|   ├── predict.py          # Script that makes predictions.
+|   └── evaluate.py         # Script for evaluating model performance.
+|
+├── models/             # State dictionaries containing weights and biases of the models
+|   |
+|   ├── GSnet_default.pt    # Original pretrained GSnet.
+|   ├── GSnet_SASA.pt       # GSnet fine-tuned for SASA predictions.
+|   ├── GSnet_pKa.pt        # GSnet fine-tuned for pKa predictions.
+|   ├── aGSnet_pka.pt       # aGSnet trained for pKa predictions.
+|   └── normalization.npz   # Normalization parameters.
 |
 ├── requirements.txt    # Required Python packages to run our model.
 ├── setup.py            # Script for installing our model as a package.
@@ -177,7 +185,13 @@ These methods allow for the flexible application of our models to a variety of p
 
 ## Pretrained Models
 
-`...`
+| Model Name           | Number of Parameters | Description                                                                                     |
+|----------------------|----------------------|-------------------------------------------------------------------------------------------------|
+| `GSnet_default.pt`    | 5,971,748       | The original GSnet model trained on geometric properties and ∆Gsol using a masked loss function. |
+| `GSnet_SASA.pt`       | 5,971,748       | GSnet fine-tuned for molecular SASA predictions with the GNN parameters frozen.                  |
+| `GSnet_pKa.pt`        | 11,210,392       | GSnet fine-tuned for residue-level SASA, then further trained to predict pKa values.              |
+| `aGSnet_pKa.pt`       | 4,784,324       | aGSnet trained from scratch on PHMD549 data and fine-tuned for pKa prediction on experimental data. |
+
 
 ## Generating Embeddings
 
