@@ -38,8 +38,6 @@ Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Pr
 - [Generating Embeddings](#generating-embeddings)
 - [Generating Datasets](#generating-datasets)
 - [Implementing our Networks](#implementing-our-networks)
-- [Contributing](#contributing)
-- [License](#license)
 - [To do](#to-do)
 
 ## Directory Structure
@@ -244,16 +242,7 @@ This method of generating embeddings is integral to leveraging the predictive po
 
 `...`
 
-## Contributing
-
-Contributions to this project are welcome! Please refer to our contributing guidelines for more information on how to submit pull requests, report issues, and participate in code reviews.
-
-## License
-
-This project is not yet licensed - see the [LICENSE](LICENSE) file for details.
-
 ## To do
 
-- Add pretrained models (will be large files though, may need to upload elsewhere)
 - Polish up and add training scripts
 - Anything else??
