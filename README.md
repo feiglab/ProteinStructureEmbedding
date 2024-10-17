@@ -390,10 +390,3 @@ For more info, see the source code for the networks in `net.py`.
 ## Generating Datasets
 
 `...`
-
-
-
-## To do
-
-- Polish up and add training scripts
-- Anything else??
