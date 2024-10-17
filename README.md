@@ -84,22 +84,27 @@ hydropro_ml/
 Before you can run the models and use the codebase, you need to set up your environment:
 
 1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/your-repository/hydropro_ml.git
-   cd hydropro_ml
-   ```
+
+```bash
+git clone https://github.com/your-repository/hydropro_ml.git
+cd hydropro_ml
+```
+
 2. **Set up the environment:**
    - If you use a virtual environment, set it up and activate it before installing the packages:
-     ```
-     python -m venv venv
-     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-     ```
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+```
+
 3. **Install required packages:**
    - Ensure that Python 3.8 or newer is installed on your system.
    - Install the required Python packages using:
-     ```bash
-     pip install -r requirements.txt
-     ```
+
+```bash
+pip install -r requirements.txt
+```
 
 
 
