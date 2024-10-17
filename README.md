@@ -245,10 +245,7 @@ This section describes how to generate embeddings for all PDB files within a spe
 1. **Prepare your environment:**
  Ensure you have followed the installation instructions to set up your environment correctly. This includes having the necessary Python packages installed and the environment activated.
 
-2. **Obtain the model:**
- Currently, you will need to manually download our pre-trained model `pka_from_sasa_res.pt` from the provided link (link to be added). Place this model in an appropriate directory accessible to your script.
-
-3. **Run the script:**
+2. **Run the script:**
  Navigate to the `src/` directory in your terminal. Use the following command to generate embeddings:
  ```bash
  python embed.py <path_to_PDB_files> <output_path_for_embeddings>
