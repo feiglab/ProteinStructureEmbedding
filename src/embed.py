@@ -9,12 +9,11 @@
 # ------------------------------------------------------------------------------
 # Citation Information
 # ------------------------------------------------------------------------------
-# Author: Spencer Wozniak
-# Email: woznia79@msu.edu
-# Paper Title: "Title of Your Research Paper"
-# Published in: Journal Name, Volume, Page Numbers, Year
+# Authors: Spencer Wozniak, Giacomo Janson, Michael Feig
+# Emails: spencerwozniak@gmail.com, mfeiglab@gmail.com
+# Paper Title: "Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning"
 # DOI: https://doi.org/xxxxxxxx
-# GitHub: https://github.com/yourusername/your-repository
+# GitHub: https://github.com/feiglab/hydropro_ml
 #
 # Please cite the above paper if you use this code in your research.
 # ------------------------------------------------------------------------------

@@ -10,11 +10,10 @@
 # Citation Information
 # ------------------------------------------------------------------------------
 # Authors: Spencer Wozniak, Giacomo Janson, Michael Feig
-# Paper Title: "Title of Your Research Paper"
-# Authors:
-# Published in: Journal of Chemical Theory and Computation, Volume, Page Numbers, Year
+# Emails: spencerwozniak@gmail.com, mfeiglab@gmail.com
+# Paper Title: "Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning"
 # DOI: https://doi.org/xxxxxxxx
-# GitHub: https://github.com/yourusername/your-repository
+# GitHub: https://github.com/feiglab/hydropro_ml
 #
 # Please cite the above paper if you use this code in your research.
 # ------------------------------------------------------------------------------
