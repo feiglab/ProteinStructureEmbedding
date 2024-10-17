@@ -51,17 +51,25 @@ hydropro_ml/
 │
 ├── datasets/           # Our datasets.
 |   |
-|   ├── train.0.csv     # Our training dataset.
-|   ├── val.0.csv       # Our validation dataset.
-|   └── test.0.csv      # Our test dataset.
+|   ├── train.0.csv         # Our training dataset.
+|   ├── val.0.csv           # Our validation dataset.
+|   └── test.0.csv          # Our test dataset.
 |
 ├── src/                # Source code of our application.
 |   |
-|   ├── dataset.py      # Classes for processing PDBs and generating datasets
-|   ├── net.py          # Neural network architectures used in our project
-|   ├── embed.py        # Script that generates embeddings.
-|   ├── predict.py      # Script that makes predictions.
-|   └── evaluate.py     # Script for evaluating model performance.
+|   ├── dataset.py          # Classes for processing PDBs and generating datasets
+|   ├── net.py              # Neural network architectures used in our project
+|   ├── embed.py            # Script that generates embeddings.
+|   ├── predict.py          # Script that makes predictions.
+|   └── evaluate.py         # Script for evaluating model performance.
+|
+├── models/             # State dictionaries containing weights and biases of the models
+|   |
+|   ├── GSnet_default.pt    # Original pretrained GSnet.
+|   ├── GSnet_SASA.pt       # GSnet fine-tuned for SASA predictions.
+|   ├── GSnet_pKa.pt        # GSnet fine-tuned for pKa predictions.
+|   ├── aGSnet_pka.pt       # aGSnet trained for pKa predictions.
+|   └── normalization.npz   # Normalization parameters.
 |
 ├── requirements.txt    # Required Python packages to run our model.
 ├── setup.py            # Script for installing our model as a package.
