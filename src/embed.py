@@ -74,6 +74,7 @@ def load_model(device):
               layernorm=False,
               advanced_residual=True)
 
+    model_dir = '../models'
     state_dict = '/feig/s1/spencer/gnn/main/models/pka_from_sasa_res.pt'
     dict1 = torch.load(state_dict, map_location=device)
     todel = [d for d in dict1 if 'fc' in d]

@@ -6,24 +6,14 @@
 # ------------------------------------------------------------------------------
 # Citation Information
 # ------------------------------------------------------------------------------
-# Author: Spencer Wozniak
-# Email: woznia79@msu.edu
-# Paper Title: "Title of Your Research Paper"
-# Published in: Journal Name, Volume, Page Numbers, Year
+# Authors: Spencer Wozniak, Giacomo Janson, Michael Feig
+# Emails: spencerwozniak@gmail.com, mfeiglab@gmail.com
+# Paper Title: "Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning"
 # DOI: https://doi.org/xxxxxxxx
-# GitHub: https://github.com/yourusername/your-repository
+# GitHub: https://github.com/feiglab/hydropro_ml
 #
 # Please cite the above paper if you use this code in your research.
 # ------------------------------------------------------------------------------
-#
-# +
-# -- To make faster --
-# Modify mdtraj source code:
-# Only need certain info from 'Trajectory' object and 'load_pdb' must be changed accordingly.
-# 'load_pdb': /home/spencer/miniconda3/lib/python3.9/site-packages/mdtraj/formats/pdb/pdbfile.py
-# 'Trajectory': /home/spencer/miniconda3/lib/python3.9/site-packages/mdtraj/core/topology.py
-# Makes more sense to just use 'compute_rg' as it is faster and more accurate
-# -
 
 ## Imports
 import os
@@ -109,7 +99,7 @@ class NumpyRep:
                 else:
                     self.idx_map[r.resSeq] = i
                     i+=1
-
+        
         if mask:
             resid = np.zeros(len(self.x))
             resid[self.idx_map[resSeq]] +=1
@@ -124,16 +114,16 @@ class NumpyRep:
         Gets coordinate array from self.traj (md.Trajectory object)
         """
         ca_indices = [i for i, atom in enumerate(self.traj.topology.atoms) if atom.name == 'CA']
-        return self.traj.xyz[0][ca_indices, :] * 10 # nm -> Å
-
+        return self.traj.xyz[0][ca_indices, :] * 10 # nm -> Å 
+    
     def get_cc(self):
         """
         Calculates distances between alpha carbons and center of mass for all residues.
         """
-        cofm = calc_cofm(self.traj)[0] * 10 # nm -> Å
+        cofm = calc_cofm(self.traj)[0] * 10 # nm -> Å 
         x_minus_cofm = self.x - cofm[np.newaxis, :]
         return np.sqrt(np.einsum('ij,ij->i', x_minus_cofm, x_minus_cofm))
-
+    
     def get_aas(self):
         """
         Gets integer representation of amino acid type for all residues.
@@ -146,12 +136,12 @@ class NumpyRep:
         AAs = ['GLN','TRP','GLU','ARG','THR','TYR',     'ILE',      'PRO',
                'ALA','SER','ASP','PHE','GLY','HIS',     'LYS','LEU',
                            'CYS','VAL',      'ASN','MET']
-
+        
         aa_map = {aa: i for i, aa in enumerate(AAs)}
         aa_map['HIS'] = aa_map['HIS'] if 'HIS' in aa_map else aa_map['HSD']
 
         return np.array([aa_map.get(r.name, aa_map['HIS']) for r in self.traj.topology.residues])
-
+   
     def get_dh(self):
         """
         Gets dihedral features (sine, cosine, mask) for all residues.
@@ -165,9 +155,9 @@ class NumpyRep:
                 for a in r.atoms:
                     a2r[a.index] = i
                 i += 1
-
+        
         # Psi
-        psis = np.array(list(md.compute_psi(self.traj)[1][0]) + [-2*np.pi])
+        psis = np.array(list(md.compute_psi(self.traj)[1][0]) + [-2*np.pi]) 
         psis_mask = np.ones(len(psis))
         psis_mask[len(psis) - 1] = 0
         psis_sin = np.sin(psis)
@@ -300,13 +290,13 @@ class NumpyRep_atomic:
         self.pdb = pdb
         self.resSeq = resSeq
         self.cutoff = cutoff
-
+        
         self.traj = load_pdb(pdb)
         self.x = self.get_coords()
-
+        
         self.idx_map = None
         self.resid_atomic, self.resid_ca, self.cutoff_atoms = self.get_masks()
-
+        
         self.x = self.x[self.cutoff_atoms]
         self.a = self.get_aas()[self.cutoff_atoms]
         self.atoms = self.get_atoms()[self.cutoff_atoms]
@@ -316,8 +306,8 @@ class NumpyRep_atomic:
         """
         Gets coordinate array of all atoms in protein from self.traj (md.Trajectory object)
         """
-        return self.traj.xyz[0] * 10 # nm -> Å
-
+        return self.traj.xyz[0] * 10 # nm -> Å 
+    
     def get_masks(self, selection='subset'):
         """
         Generates masks.
@@ -337,10 +327,10 @@ class NumpyRep_atomic:
 
         resid_atomic = np.zeros(len(self.x))
         resid_atomic[self.idx_map[self.resSeq][0]:self.idx_map[self.resSeq][1]] += 1
-
+        
         resid_ca = np.zeros(len(self.x))
         resid_ca[self.idx_map[self.resSeq][2]] += 1
-
+        
         resid_atomic, resid_ca = resid_atomic.astype(bool), resid_ca.astype(bool)
 
         x = self.x[resid_ca]
@@ -348,13 +338,13 @@ class NumpyRep_atomic:
         dists = np.sqrt(np.einsum('ij,ij->i', x_minus_x, x_minus_x))
         cutoff_atoms = dists < self.cutoff
         cutoff_atoms = cutoff_atoms.astype(bool)
-
+        
         if selection == 'subset':
             resid_atomic = resid_atomic[cutoff_atoms]
             resid_ca = resid_ca[cutoff_atoms]
-
+        
         return resid_atomic, resid_ca, cutoff_atoms
-
+    
     def get_aas(self):
         """
         Gets integer representation of amino acid type for all atoms.
@@ -367,14 +357,14 @@ class NumpyRep_atomic:
         AAs = ['GLN','TRP','GLU','ARG','THR','TYR',     'ILE',      'PRO',
                'ALA','SER','ASP','PHE','GLY','HIS',     'LYS','LEU',
                            'CYS','VAL',      'ASN','MET']
-
+        
         aa_map = {aa: i for i, aa in enumerate(AAs)}
         aa_map['HIS'] = aa_map['HIS'] if 'HIS' in aa_map else aa_map['HSD']
 
         return np.array(
             [aa_map.get(a.residue.name, aa_map['HIS']) for a in self.traj.topology.atoms]
         )
-
+    
     def get_atoms(self):
         """
         Gets integer representation of atom type for all atoms.
@@ -382,11 +372,11 @@ class NumpyRep_atomic:
         # Arranged in arbitrary order
         atoms = ['H','C','N','O','S']
         atom_map = {atom: i for i, atom in enumerate(atoms)}
-
+        
         return np.array(
             [atom_map.get(a.name[0]) for a in self.traj.topology.atoms]
         )
-
+        
     def get_charge(self):
         """
         Gets charge for all atoms (calculated via pdb2pqr).
@@ -621,7 +611,7 @@ class AtomicDataset(Dataset):
         # Normalize the data if required
         if normalize:
             self.avg, self.std = self.normalize_()
-
+            
         # Caching
         self.cache_dir = cache_dir
         if self.cache_dir is not None:
@@ -679,7 +669,7 @@ class AtomicDataset(Dataset):
                 except Exception as e:
                     sys.stderr.write(f"WARNING: Failed to load cache file {cache_path}: {e}\nThis file is likely corrupted. It will be removed.\n")
                     os.remove(cache_path)
-
+                    
         fn = self.filelist[inx]
 
         f_load = f'{self.root}/{fn}'
@@ -700,7 +690,7 @@ class AtomicDataset(Dataset):
             resid_ca=torch.tensor(data['resid_ca']),
             y=torch.tensor(z, dtype=torch.float32).reshape(1, -1)
         )
-
+        
         if self.cache_dir is not None:
             torch.save(graph, cache_path)
 
@@ -884,4 +874,11 @@ class CombinedDataset(Dataset):
 
 
 if __name__ == '__main__':
-    pass
+    test_data = CombinedDataset(root_atomic=f'/feig/s1/spencer/gnn/data/pka/processed/cluster/deviation/0130/phmd/atomic/test',
+                               root_res=f'/feig/s1/spencer/gnn/data/pka/processed/cluster/deviation/0130/phmd/test/',
+                                esm_path=f'/feig/s1/spencer/gnn/compare/ESM/data/embeddings/650M/new',
+                                normalize=False,
+                               )
+
+    test_data
+    test_data[0]

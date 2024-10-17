@@ -3,13 +3,16 @@
 #
 # Script for making predictions
 #
+# Code by: Spencer Wozniak
+# Email: woznia79@msu.edu
+#
 # ------------------------------------------------------------------------------
 # Citation Information
 # ------------------------------------------------------------------------------
-# Author: Spencer Wozniak
-# Email: woznia79@msu.edu
+# Authors: Spencer Wozniak, Giacomo Janson, Michael Feig
 # Paper Title: "Title of Your Research Paper"
-# Published in: Journal Name, Volume, Page Numbers, Year
+# Authors:
+# Published in: Journal of Chemical Theory and Computation, Volume, Page Numbers, Year
 # DOI: https://doi.org/xxxxxxxx
 # GitHub: https://github.com/yourusername/your-repository
 #
@@ -26,15 +29,15 @@ from torch_scatter import scatter
 import os
 import sys
 import warnings
+import subprocess as sub
 from collections import OrderedDict
 from cprint import *
-import warnings
 from Bio import PDB
 from time import perf_counter
 #warnings.filterwarnings('ignore')
 
-from dataset import NumpyRep
-from net import Net, ShiftedSoftplus, FC
+from dataset import NumpyRep, NumpyRep_atomic
+from net import Net, Net_atomic, ShiftedSoftplus, FC
 
 #print("PyTorch version:", torch.__version__)
 #print("PyTorch Geometric version:", torch_geometric.__version__)
@@ -114,6 +117,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='ML prediction on PDB files')
     parser.add_argument('--clean', action='store_true', help='Clean PDB files before making predictions.')
     parser.add_argument('--pka', action='store_true', help='Predict pKa.')
+    parser.add_argument('--atomic', action='store_true', help='Use a-GSnet for pKa predictions')
     parser.add_argument('--multi', action='store_true', help='Use multiple models to predict pKa on a per-residue basis.')
     parser.add_argument('--sasa', action='store_true', help='Predict SASA.')
     parser.add_argument('--shift', action='store_true', help='Calculate pKa shift (relative to standard value).')
@@ -133,8 +137,12 @@ def parse_args():
     assert not (args.cpu and args.gpu), 'Cannot run on both CPU and GPU!'
     assert not ((args.chain is not None) and args.combine_chains), f'Cannot select chain {args.chain} and combine chains.'
     assert not (args.sasa and args.pka), 'Cannot calculate SASA when predicting pKa.'
+    
     if args.shift or args.multi:
         assert args.pka, "'--pka' must be selected to calculate shifts."
+    
+    if args.atomic:
+        assert args.pka, "'--pka' must be selected to use a-GSnet"
 
     try:
         return args
@@ -174,25 +182,49 @@ def load_models(args, device):
     models = {}
 
     if args.pka:
-        models['gnn'] = Net(use_transfer=True, out_channels_t=1, residue_pred=True,
-                            pad_thresh=False, global_mean=True, env_thresh=[6,8,10,12,15],
-                            one_hot_res=True, include_input=False, hidden_channels=150,
-                            num_filters=150, num_interactions=6, num_gaussians=300,
-                            cutoff=15.0, max_num_neighbors=64, readout='mean',
-                            out_channels=1, dropout=0.0, num_linear=6, linear_channels=1024,
-                            activation='ssp', cc_embedding='rbf', gnn_layer='transformerconv',
-                            heads=1, mlp_activation='relu', standardize_cc=True,
-                            layernorm=False, advanced_residual=True)
+        if not args.atomic:
+            models['gnn'] = Net(use_transfer=True, out_channels_t=1, residue_pred=True,
+                                pad_thresh=False, global_mean=True, env_thresh=[6,8,10,12,15],
+                                one_hot_res=True, include_input=False, hidden_channels=150,
+                                num_filters=150, num_interactions=6, num_gaussians=300,
+                                cutoff=15.0, max_num_neighbors=64, readout='mean',
+                                out_channels=1, dropout=0.0, num_linear=6, linear_channels=1024,
+                                activation='ssp', cc_embedding='rbf', gnn_layer='transformerconv',
+                                heads=1, mlp_activation='relu', standardize_cc=True,
+                                layernorm=False, advanced_residual=True)
 
-        state_dict = torch.load(f'/feig/s1/spencer/gnn/SchNet/models/pka/production/pka_030824_exp2_4/torch/tr_131_val.pt', map_location=device)
-        models['gnn'].load_state_dict(state_dict, strict=False)
+            state_dict = torch.load(f'{model_dir}/GSnet_pKa.pt', map_location=device)
+            models['gnn'].load_state_dict(state_dict, strict=False)
+        else:
+            models['gnn'] = Net_atomic(
+                              fc_opt            = 1,      # Option for GNN -> FC “FCopt{N}”
+                              hidden_channels   = 75,     # Number of hidden dimensions -> “{N}channels”
+                              num_filters       = 150,    # Number of convolutional filters -> “{N}filters”
+                              num_interactions  = 3,      # Number of layers -> “{N}layers”
+                              num_gaussians     = 300,    # Number of gaussians for distance expansion
+                              sele_cutoff       = 10.0,   # Selection cutoff
+                              edge_cutoff       = 5.0,    # Radius graph cutoff -> “{X}edgecutoff”
+                              max_num_neighbors = 150,    # Maximum edges per node
+                              readout           = 'mean', # Read out the mean
+                              out_channels      = 1,      # Number of outcomes (1 for pKa)
+                              dropout           = 0.0,    # Dropout rate
+                              num_linear        = 6,      # Number of linear layers in FC -> “{N}lin”
+                              linear_channels   = 1024,   # Number of hidden linear dims -> “{N}FCch
+                              activation        = 'ssp',  # Activation function used in FC layers
+                              mlp_activation    = 'relu', # Activation function used in MLP embeddings
+                              heads             = 3,      # Number of transformer attention heads “{N}heads”              
+                              advanced_residual = True,   # Create residual connections?
+                              one_hot_res       = False,  # Append one-hot residue encoding to FC?
+                            )
+            state_dict = torch.load(f'{model_dir}/aGSnet_pka.pt', map_location=device)
+            models['gnn'].load_state_dict(state_dict, strict=False)
     elif args.sasa:
         models['gnn'] = Net(embedding_only=True, scatter_embedding=True)
-        state_dict = torch.load(f'{model_dir}/transformer_default.pt', map_location=device)
+        state_dict = torch.load(f'{model_dir}/GSnet_default.pt', map_location=device)
         models['gnn'].load_state_dict(state_dict, strict=False)
 
         models['sasa'] = FC(in_channels=150, num_linear=4, out_channels=1, dropout=0.0)
-        fc_elements = OrderedDict((f'fc{k[4:]}', v) for k, v in torch.load(f'{model_dir}/transformer_sasa.pt', map_location=device).items() if k.startswith('fc_t'))
+        fc_elements = OrderedDict((f'fc{k[4:]}', v) for k, v in torch.load(f'{model_dir}/GSnet_SASA.pt', map_location=device).items() if k.startswith('fc_t'))
         models['sasa'].load_state_dict(fc_elements)
 
         models['6'] = FC(in_channels=150, num_linear=4, out_channels=6, dropout=0.0)
@@ -274,11 +306,12 @@ def create_representation(pdb, args):
     list
         A list of Numpy representations of the PDB file.
     """
+
     if args.time:
         t0 = perf_counter()
 
     if not args.numpy:
-        try:
+        try: # Try to create a numpy representation of the PDB
             pdb_rep = NumpyRep(pdb)
         except FileNotFoundError:
             raise FileNotFoundError(f'{pdb} not found.')
@@ -293,7 +326,7 @@ def create_representation(pdb, args):
                 io.set_structure(PDB.PDBParser().get_structure(None, pdb))
                 io.save(new, select=AtomSelect())
                 pdb_rep = create_representation(new, args)[0]
-                if not args.keep:
+                if not args.keep and not args.atomic:
                     os.remove(new)
             except Exception as e:
                 raise RuntimeError(f'Error creating representation from {pdb}: {e}')
@@ -312,7 +345,7 @@ def create_representation(pdb, args):
                     pdb_rep = create_representation(new, args)[0]
                     pdb_rep.chain = args.chain
                     reps = [pdb_rep]
-                    if not args.keep:
+                    if not args.keep and not args.atomic:
                         os.remove(new)
                 else:
                     reps = []
@@ -323,7 +356,7 @@ def create_representation(pdb, args):
                         pdb_rep = create_representation(new, args)[0]
                         pdb_rep.chain = chain.id
                         reps.append(pdb_rep)
-                        if not args.keep:
+                        if not args.keep and not args.atomic:
                             os.remove(new)
             else:
                 model = structure[0]
@@ -343,7 +376,7 @@ def create_representation(pdb, args):
                 io.save(new, select=AtomSelect())
                 pdb_rep = create_representation(new, args)[0]
                 reps = [pdb_rep]
-                if not args.keep:
+                if not args.keep and not args.atomic:
                     os.remove(new)
     else:
         reps = [pdb]
@@ -353,7 +386,6 @@ def create_representation(pdb, args):
         print(f'PDB -> NUMPY: {t1-t0} s')
 
     return reps
-
 
 def predict(rep, models, avg, std, args, device):
     """
@@ -383,59 +415,109 @@ def predict(rep, models, avg, std, args, device):
 
     if not args.numpy:
         # Convert Numpy data to Torch tensor
-        try:
-            pos = torch.tensor(rep.x, dtype=torch.float).to(device)
-            a = torch.tensor(rep.get_aas(), dtype=torch.long).to(device)
-            cc = torch.tensor(rep.get_cc(), dtype=torch.float).reshape(-1, 1).to(device)
-            dh = torch.tensor(rep.get_dh(), dtype=torch.float).to(device)
-        except Exception as e:
-            print(f'Error with {rep.pdb}. Check PDB for missing atoms.')
-            return
+        if not args.atomic:
+            try:
+                pos = torch.tensor(rep.x, dtype=torch.float).to(device)
+                a = torch.tensor(rep.get_aas(), dtype=torch.long).to(device)
+                cc = torch.tensor(rep.get_cc(), dtype=torch.float).reshape(-1, 1).to(device)
+                dh = torch.tensor(rep.get_dh(), dtype=torch.float).to(device)
+            except Exception as e:
+                print(f'Error with {rep.pdb}. Check PDB for missing atoms.')
+                return
     else:
-        # Load data directly from .npz file
         data = np.load(rep)
-        pos = torch.tensor(data['x'], dtype=torch.float).to(device)
-        a = torch.tensor(data['a'], dtype=torch.long).to(device)
-        cc = torch.tensor(data['cc'], dtype=torch.float).reshape(-1, 1).to(device)
-        dh = torch.tensor(data['dh'], dtype=torch.float).to(device)
-        if args.pka:
-            resid = torch.tensor(data['resid']).to(device)
-
+        if not args.atomic:
+            # Load data directly from .npz file
+            pos = torch.tensor(data['x'], dtype=torch.float).to(device)
+            a = torch.tensor(data['a'], dtype=torch.long).to(device)
+            cc = torch.tensor(data['cc'], dtype=torch.float).reshape(-1, 1).to(device)
+            dh = torch.tensor(data['dh'], dtype=torch.float).to(device)
+            if args.pka:
+                resid = torch.tensor(data['resid']).to(device)
+        else:
+            pos = torch.tensor(data['x'], dtype=torch.float).to(device)
+            a = torch.tensor(data['a'], dtype=torch.long).to(device)
+            atoms = torch.tensor(data['atoms'], dtype=torch.long).to(device)
+            charge = torch.tensor(data['charge'], dtype=torch.float).to(device)
+            resid_atomic = torch.tensor(data['resid_atomic']).to(device)
+            resid_ca = torch.tensor(data['resid_ca']).to(device)
     if args.time:
         t1 = perf_counter()
         print(f'NUMPY -> TORCH: {t1-t0} s')
 
     if args.pka:
-        if not args.numpy:
-            prot = rep.traj.top
+        
+        # Define standard pKa values
+        standard = {
+            'GLU': 4.07,
+            'LYS': 10.54,
+            'CYS': 8.37,
+            'HIS': 6.04,
+            'ASP': 3.90,
+            'TYR': 10.46,
+        }
 
-            # Standard pKa values
-            standard = {
-                'GLU': 4.07,
-                'LYS': 10.54,
-                'CYS': 8.37,
-                'HIS': 6.04,
-                'ASP': 3.90,
-                'TYR': 10.46,
-            }
+        if not args.numpy:
+            
+            prot = rep.traj.top
 
             resids = []
             for r in prot.residues:
                 if (r_3 := r.__repr__()[:3]) in standard:
                     resSeq = r.resSeq
-                    idx = torch.tensor(rep.resSeq_to_resid(resSeq, mask=True))
 
-                    with torch.no_grad():
-                        pred = models['gnn'](pos, a, cc, dh, resid=idx).cpu().detach().numpy()[0][0] * std + avg
+                    if not args.atomic:
+                        idx = torch.tensor(rep.resSeq_to_resid(resSeq, mask=True))
 
-                    if args.shift:
-                        pred -= standard[r_3]
+                        with torch.no_grad():
+                            pred = models['gnn'](pos, 
+                                                 a, 
+                                                 cc, 
+                                                 dh, 
+                                                 resid=idx)
+
+                    else:
+                        pqr = '.'.join([frag for frag in rep.pdb.split('.')[:-1] + ['pqr']])
+                       
+                        if not os.path.isfile(pqr):
+                            sub.run(
+                                f'pdb2pqr30 --ff CHARMM {rep.pdb} {pqr}', shell=True,
+                                stderr=sub.DEVNULL, stdout=sub.DEVNULL
+                            )
+                        
+                        atomic_rep = NumpyRep_atomic(pqr,resSeq)
+                        with torch.no_grad():
+                            pred = models['gnn'](torch.tensor(atomic_rep.x, dtype=torch.float).to(device),
+                                                 torch.tensor(atomic_rep.a, dtype=torch.long).to(device),
+                                                 torch.tensor(atomic_rep.atoms, dtype=torch.long).to(device),
+                                                 torch.tensor(atomic_rep.charge, dtype=torch.float).to(device),
+                                                 resid_ca=torch.tensor(atomic_rep.resid_ca).to(device),
+                                                 resid_atomic=torch.tensor(atomic_rep.resid_atomic).to(device))
+
+                    pred = pred.cpu().detach().numpy()[0][0] * std + avg
+
+                    if not args.shift:
+                        pred += standard[r_3]
 
                     print_result('pka', pred, rep.pdb, resid=resSeq, aa=r_3, chain=rep.chain)
         else:
             with torch.no_grad():
-                pred = models['gnn'](pos, a, cc, dh, resid=resid).cpu().detach().numpy()[0][0] * std + avg
+                if not args.atomic: # Making a pKa prediction on an NPZ file with GSnet
+                    pred = models['gnn'](pos, 
+                                         a, 
+                                         cc, 
+                                         dh, 
+                                         resid=resid)
+                else: # Making a pKa prediction on an NPZ file with a-GSnet
+                    pred = models['gnn'](pos, 
+                                         a, 
+                                         atoms, 
+                                         charge, 
+                                         resid_ca=resid_ca, 
+                                         resid_atomic=resid_atomic)
 
+                pred = pred.cpu().detach().numpy()[0][0] * std + avg
+            
             print_result('pka', pred, rep)
 
     elif args.sasa:
@@ -502,7 +584,11 @@ def load_normalization_parameters(args, model_dir):
     normalization_params = np.load(f'{model_dir}/normalization.npz')
 
     if args.pka:
-        return normalization_params['pka']
+        #print(normalization_params['pka'])
+        if args.atomic:
+            return normalization_params['pka_a']
+        else:
+            return normalization_params['pka_r']
     elif args.sasa:
         print('ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE')
         avg = [normalization_params['default'][0], normalization_params['sasa'][0]]
@@ -556,8 +642,10 @@ def make_predictions(representations, models, avg, std, args, device):
         try:
             predict(rep, models, avg, std, args, device)
         except KeyError as e:
+            raise e
             sys.stderr.write(f'Error with {rep}: {e}\n')
         except RuntimeError as e:
+            raise e
             sys.stderr.write(f'Error with {rep}: {e}\n')
 
 
