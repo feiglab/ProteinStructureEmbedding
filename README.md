@@ -276,7 +276,7 @@ This command processes all PDB files in `/path/to/pdb` and saves the resulting e
 ### Notes
 
 - The script utilizes multiprocessing to expedite the embedding process. Ensure your system has adequate resources to handle multiple processes simultaneously.
-- The embedding process is sensitive to the structure and quality of the input PDB files. Ensure that the files are correctly formatted and contain all necessary information.
+- The embedding process can be sensitive to the structure and quality of the input PDB files. The scripts will automatically attempt to clean and process broken PDB files, but it may not always work. Please ensure that the files you use are correctly formatted and contain all necessary information.
 
 This method of generating embeddings is integral to leveraging the predictive power of our GNN models for analyzing protein structures.
 
