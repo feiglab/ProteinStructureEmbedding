@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/var/spool/slurmd/job1714813/slurm_script", line 37, in <module>
-    from .dataset import NumpyRep, NumpyRep_atomic
-ImportError: attempted relative import with no known parent package
