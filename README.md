@@ -191,6 +191,39 @@ python predict.py --sasa /path/to/pdb_file.pdb
 
 These methods allow for the flexible application of our models to a variety of prediction tasks in protein analysis.
 
+For a full description of the utility of the `predict.py` script, you can run `python predict.py -h` or `python predict.py --help`:
+
+```
+usage: predict.py [-h] [--clean] [--pka] [--atomic] [--multi] [--sasa]
+                  [--shift] [--chain chain] [--combine-chains] [--keep]
+                  [--cpu] [--gpu] [--numpy] [--time] [--skip-bad-files]
+                  pdbs [pdbs ...]
+
+ML prediction on PDB files
+
+positional arguments:
+  pdbs              List of PDB files.
+
+optional arguments:
+  -h, --help        show this help message and exit
+  --clean           Clean PDB files before making predictions.
+  --pka             Predict pKa.
+  --atomic          Use a-GSnet for pKa predictions
+  --multi           Use multiple models to predict pKa on a per-residue
+                    basis.
+  --sasa            Predict SASA.
+  --shift           Calculate pKa shift (relative to standard value).
+  --chain chain     Specify chain.
+  --combine-chains  Make calculation for structure of all chains in a PDB
+                    file.
+  --keep            Keep cleaned PDB files.
+  --cpu             Run on CPU.
+  --gpu             Run on GPU.
+  --numpy           Use .npz file as input.
+  --time            Time different aspects of the model.
+  --skip-bad-files  Skip bad PDB files.
+```
+
 ## Pretrained Models
 
 | Model Name           | Number of Parameters | Description                                                                                     |
