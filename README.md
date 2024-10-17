@@ -1,5 +1,11 @@
 # Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning
 
+**GSnet**
+![GSNet architecture](https://github.com/user-attachments/assets/2e49b0b6-a74b-4481-9a8d-129edeb0e57a)
+
+**a-GSnet**
+![a-GSnet architecture](https://github.com/user-attachments/assets/d74130a7-120a-4542-8cfd-19041936cdf8)
+
 ## Overview
 
 This document offers an overview of the project, installation steps, and instructions to help users effectively implement and utilize our tools and models.
@@ -115,55 +121,65 @@ This section explains how to use our models to make predictions on protein prope
  python predict.py --option <path_to_pdb_file>
  ```
  Replace `--option` with either `--pka`, `--sasa`, or no option for default predictions.
+ 
+ 
 
 #### pKa Prediction
 - **pKa value prediction:**
 ```bash
-python predict.py --pka pdb_file.pdb
+python predict.py --pka /path/to/pdb_file.pdb
+```
+Note that `GSnet` is the default option. pKa predictions are more accurate with `a-GSnet`. To use `a-GSnet`, you must use the option `--atomic`.
+```bash
+python predict.py --pka --atomic /path/to/pdb_file.pdb
 ```
 - **Sample Output:**
 ```
 ...
-7.315245148533568 LYS 4 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
-3.9241322437930055 ASP 5 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
-8.401511664982062 LYS 7 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
-3.903559068776328 ASP 11 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+7.315245148533568 LYS 4 A /path/to/pdb_file.pdb
+3.9241322437930055 ASP 5 A /path/to/pdb_file.pdb
+8.401511664982062 LYS 7 A /path/to/pdb_file.pdb
+3.903559068776328 ASP 11 A /path/to/pdb_file.pdb
 ...
 ```
 - **pKa shift prediction:**
 ```bash
-python predict.py --pka --shift pdb_file.pdb
+python predict.py --pka --shift /path/to/pdb_file.pdb
+```
+or
+```bash
+python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
 ```
 - **Sample Output:**
 ```
 ...
--3.2247548514664315 LYS 4 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
-0.024132243793005603 ASP 5 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
--2.1384883350179376 LYS 7 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
-0.003559068776328278 ASP 11 A /feig/s1/spencer/gnn/cases/groel/1AON_A.pdb
+-3.2247548514664315 LYS 4 A /path/to/pdb_file.pdb
+0.024132243793005603 ASP 5 A /path/to/pdb_file.pdb
+-2.1384883350179376 LYS 7 A /path/to/pdb_file.pdb
+0.003559068776328278 ASP 11 A /path/to/pdb_file.pdb
 ...
 ```
 
 #### Default Physicochemical Properties Prediction
 - **Command:**
 ```bash
-python predict.py pdb_file.pdb
+python predict.py /path/to/pdb_file.pdb
 ```
 - **Sample Output:**
 ```
 ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
--27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       pdb_file.pdb
+-27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       /path/to/pdb_file.pdb
 ```
 
 #### Solvent-Accessible Surface Area (SASA) Prediction
 - **Command:**
 ```bash
-python predict.py --sasa pdb_file.pdb
+python predict.py --sasa /path/to/pdb_file.pdb
 ```
 - **Sample Output:**
 ```
 ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE
--27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       57.129E       pdb_file.pdb
+-27.580E      12.391E       22.216E       0.982E        0.734E        38.517E       57.129E       /path/to/pdb_file.pdb
 ```
 
 ### Troubleshooting
@@ -180,6 +196,39 @@ python predict.py --sasa pdb_file.pdb
 - Remember to use the cleaning options if your PDB files might contain non-standard residues or formats.
 
 These methods allow for the flexible application of our models to a variety of prediction tasks in protein analysis.
+
+For a full description of the utility of the `predict.py` script, you can run `python predict.py -h` or `python predict.py --help`:
+
+```
+usage: predict.py [-h] [--clean] [--pka] [--atomic] [--multi] [--sasa]
+                  [--shift] [--chain chain] [--combine-chains] [--keep]
+                  [--cpu] [--gpu] [--numpy] [--time] [--skip-bad-files]
+                  pdbs [pdbs ...]
+
+ML prediction on PDB files
+
+positional arguments:
+  pdbs              List of PDB files.
+
+optional arguments:
+  -h, --help        show this help message and exit
+  --clean           Clean PDB files before making predictions.
+  --pka             Predict pKa.
+  --atomic          Use a-GSnet for pKa predictions
+  --multi           Use multiple models to predict pKa on a per-residue
+                    basis.
+  --sasa            Predict SASA.
+  --shift           Calculate pKa shift (relative to standard value).
+  --chain chain     Specify chain.
+  --combine-chains  Make calculation for structure of all chains in a PDB
+                    file.
+  --keep            Keep cleaned PDB files.
+  --cpu             Run on CPU.
+  --gpu             Run on GPU.
+  --numpy           Use .npz file as input.
+  --time            Time different aspects of the model.
+  --skip-bad-files  Skip bad PDB files.
+```
 
 ## Pretrained Models
 
@@ -202,10 +251,7 @@ This section describes how to generate embeddings for all PDB files within a spe
 1. **Prepare your environment:**
  Ensure you have followed the installation instructions to set up your environment correctly. This includes having the necessary Python packages installed and the environment activated.
 
-2. **Obtain the model:**
- Currently, you will need to manually download our pre-trained model `pka_from_sasa_res.pt` from the provided link (link to be added). Place this model in an appropriate directory accessible to your script.
-
-3. **Run the script:**
+2. **Run the script:**
  Navigate to the `src/` directory in your terminal. Use the following command to generate embeddings:
  ```bash
  python embed.py <path_to_PDB_files> <output_path_for_embeddings>
@@ -230,7 +276,7 @@ This command processes all PDB files in `/path/to/pdb` and saves the resulting e
 ### Notes
 
 - The script utilizes multiprocessing to expedite the embedding process. Ensure your system has adequate resources to handle multiple processes simultaneously.
-- The embedding process is sensitive to the structure and quality of the input PDB files. Ensure that the files are correctly formatted and contain all necessary information.
+- The embedding process can be sensitive to the structure and quality of the input PDB files. The scripts will automatically attempt to clean and process broken PDB files, but it may not always work. Please ensure that the files you use are correctly formatted and contain all necessary information.
 
 This method of generating embeddings is integral to leveraging the predictive power of our GNN models for analyzing protein structures.
 
