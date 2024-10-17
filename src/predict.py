@@ -116,7 +116,6 @@ def parse_args():
     parser.add_argument('--clean', action='store_true', help='Clean PDB files before making predictions.')
     parser.add_argument('--pka', action='store_true', help='Predict pKa.')
     parser.add_argument('--atomic', action='store_true', help='Use a-GSnet for pKa predictions')
-    parser.add_argument('--multi', action='store_true', help='Use multiple models to predict pKa on a per-residue basis.')
     parser.add_argument('--sasa', action='store_true', help='Predict SASA.')
     parser.add_argument('--shift', action='store_true', help='Calculate pKa shift (relative to standard value).')
     parser.add_argument('--chain', metavar='chain', help='Specify chain.')
@@ -136,11 +135,20 @@ def parse_args():
     assert not ((args.chain is not None) and args.combine_chains), f'Cannot select chain {args.chain} and combine chains.'
     assert not (args.sasa and args.pka), 'Cannot calculate SASA when predicting pKa.'
     
-    if args.shift or args.multi:
+    if args.shift:
         assert args.pka, "'--pka' must be selected to calculate shifts."
     
     if args.atomic:
         assert args.pka, "'--pka' must be selected to use a-GSnet"
+
+    if args.pka and (not args.atomic):
+        sys.stderr.write("##### WARNING! #####\n"
+                         "You are currently running pKa predictions with GSnet.\n"
+                         "GSnet is slower and less accurate than a-GSnet for pKa predictions.\n"
+                         "Use --atomic to run pKa predictions with the faster, more accurate a-GSnet!\n"
+                         "(Ignore this warning if you are intentionally using GSnet.)\n"
+                         "####################\n"
+                         )
 
     try:
         return args
@@ -182,14 +190,14 @@ def load_models(args, device):
     if args.pka:
         if not args.atomic:
             models['gnn'] = Net(use_transfer=True, out_channels_t=1, residue_pred=True,
-                                pad_thresh=False, global_mean=True, env_thresh=[6,8,10,12,15],
-                                one_hot_res=True, include_input=False, hidden_channels=150,
+                                global_mean=True, env_thresh=[6,8,10,12,15],
+                                one_hot_res=True, hidden_channels=150,
                                 num_filters=150, num_interactions=6, num_gaussians=300,
                                 cutoff=15.0, max_num_neighbors=64, readout='mean',
                                 out_channels=1, dropout=0.0, num_linear=6, linear_channels=1024,
-                                activation='ssp', cc_embedding='rbf', gnn_layer='transformerconv',
+                                activation='ssp', cc_embedding='rbf',
                                 heads=1, mlp_activation='relu', standardize_cc=True,
-                                layernorm=False, advanced_residual=True)
+                                advanced_residual=True)
 
             state_dict = torch.load(f'{model_dir}/GSnet_pKa.pt', map_location=device)
             models['gnn'].load_state_dict(state_dict, strict=False)
@@ -217,7 +225,7 @@ def load_models(args, device):
             state_dict = torch.load(f'{model_dir}/aGSnet_pka.pt', map_location=device)
             models['gnn'].load_state_dict(state_dict, strict=False)
     elif args.sasa:
-        models['gnn'] = Net(embedding_only=True, scatter_embedding=True)
+        models['gnn'] = Net(embedding_only=True)
         state_dict = torch.load(f'{model_dir}/GSnet_default.pt', map_location=device)
         models['gnn'].load_state_dict(state_dict, strict=False)
 
