@@ -1,16 +1,16 @@
 # Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning
 
-**GSnet**
+## GSnet
 ![GSNet architecture](https://github.com/user-attachments/assets/2e49b0b6-a74b-4481-9a8d-129edeb0e57a)
 
-**a-GSnet**
-![a-GSnet architecture](https://github.com/user-attachments/assets/d74130a7-120a-4542-8cfd-19041936cdf8)
+## aLCnet
+![aLCnet architecture](https://github.com/user-attachments/assets/d74130a7-120a-4542-8cfd-19041936cdf8)
 
 ## Overview
 
 ### Graph Neural Network-Based Prediction
 
-This project leverages **Graph Neural Networks (GNNs)** to accelerate the computational prediction of protein properties. Our model, the `Global Structure Embedding Network (GSnet)`, is adept at predicting a variety of physicochemical properties from three-dimensional protein structures. A notable feature of `GSnet`, and the related `a-GSnet`, is their ability to deliver rapid and accurate predictions of experimental pKa values, achieved by pretraining on related properties and simulated pKa values, respectively. The application of **transfer learning** allows these models to utilize previously learned representations, enhancing their predictive accuracy even with limited specific training data. 
+This project leverages **Graph Neural Networks (GNNs)** to accelerate the computational prediction of protein properties. Our model, the `Global Structure Embedding Network (GSnet)`, is adept at predicting a variety of physicochemical properties from three-dimensional protein structures. A notable feature of `GSnet`, and the related `aLCnet`, is their ability to deliver rapid and accurate predictions of experimental pKa values, achieved by pretraining on related properties and simulated pKa values, respectively. The application of **transfer learning** allows these models to utilize previously learned representations, enhancing their predictive accuracy even with limited specific training data. 
 
 Properties that these models can predict include:
 
@@ -131,7 +131,7 @@ This section explains how to use our models to make predictions on protein prope
 ```bash
 python predict.py --pka /path/to/pdb_file.pdb
 ```
-Note that `GSnet` is the default option. pKa predictions are more accurate with `a-GSnet`. To use `a-GSnet`, you must use the option `--atomic`.
+Note that `GSnet` is the default option. pKa predictions are more accurate with `aLCnet`. To use `aLCnet`, you must use the option `--atomic`.
 ```bash
 python predict.py --pka --atomic /path/to/pdb_file.pdb
 ```
@@ -213,7 +213,7 @@ optional arguments:
   -h, --help        show this help message and exit
   --clean           Clean PDB files before making predictions.
   --pka             Predict pKa.
-  --atomic          Use a-GSnet for pKa predictions
+  --atomic          Use aLCnet for pKa predictions
   --sasa            Predict SASA.
   --shift           Calculate pKa shift (relative to standard value).
   --chain chain     Specify chain.
@@ -349,7 +349,7 @@ model = Net(
 2. Load model weights (if needed)
 3. Run a forward pass
 
-### Implementing a-GSnet
+### Implementing aLCnet
 
 1. Load the model
 
