@@ -1,10 +1,10 @@
-numpy
-torch
-torch-geometric
+numpy==1.23.0
+torch==1.10.1
+torch_geometric
 torch-scatter
 torch-cluster
 matplotlib
-scipy
-mdtraj
+scipy==1.13.1
+mdtraj==1.10.1
 einops
 biopython

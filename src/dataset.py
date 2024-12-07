@@ -381,7 +381,7 @@ class NumpyRep_atomic:
         
         return np.array(
             [atom_map.get(a.name[0]) for a in self.traj.topology.atoms]
-        )
+       )
         
     def get_charge(self):
         """
