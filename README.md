@@ -136,7 +136,8 @@ python predict.py --sasa /path/to/pdb_file.pdb
 ```
 
 #### pKa Prediction
-- **pKa value prediction:**
+**pKa value prediction:**
+- **Command:**
 ```bash
 python predict.py --pka /path/to/pdb_file.pdb
 ```
@@ -152,7 +153,8 @@ python predict.py --pka --atomic /path/to/pdb_file.pdb
 3.903559068776328 ASP 11 A /path/to/pdb_file.pdb
 ...
 ```
-- **pKa shift prediction:**
+**pKa shift prediction**
+- **Command:**
 ```bash
 python predict.py --pka --shift /path/to/pdb_file.pdb
 ```
