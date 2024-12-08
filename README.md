@@ -1,11 +1,5 @@
 # Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning
 
-## GSnet
-![GSNet architecture](https://github.com/user-attachments/assets/2e49b0b6-a74b-4481-9a8d-129edeb0e57a)
-
-## aLCnet
-![aLCnet architecture](https://github.com/user-attachments/assets/d74130a7-120a-4542-8cfd-19041936cdf8)
-
 ## Overview
 
 ### Graph Neural Network-Based Prediction
