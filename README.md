@@ -53,9 +53,9 @@ hydropro_ml/
 │
 ├── datasets/           # Our datasets.
 |   |
-|   ├── train.0.csv         # Our training dataset.
-|   ├── val.0.csv           # Our validation dataset.
-|   └── test.0.csv          # Our test dataset.
+|   ├── MSU-pKa-train.csv   # Our training dataset.
+|   ├── MSU-pKa-val.csv     # Our validation dataset.
+|   └── MSU-pKa-test.csv    # Our test dataset.
 |
 ├── src/                # Source code of our application.
 |   |
