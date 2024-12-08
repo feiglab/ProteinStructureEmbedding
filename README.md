@@ -29,47 +29,15 @@ Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Pr
 
 ## Table of Contents
 
-- [Directory Structure](#directory-structure)
 - [Installation](#installation)
 - [Making Predictions](#making-predictions)
 - [Pretrained Models](#pretrained-models)
 - [Generating Embeddings](#generating-embeddings)
 - [Implementing our Networks](#implementing-our-networks)
 - [Generating Datasets](#generating-datasets)
-- [To do](#to-do)
+- [Directory Structure](#directory-structure)
 
-## Directory Structure
 
-Here’s a brief overview of the directory structure:
-
-```
-hydropro_ml/
-│
-├── datasets/           # Our datasets.
-|   |
-|   ├── MSU-pKa-train.csv   # Our training dataset.
-|   ├── MSU-pKa-val.csv     # Our validation dataset.
-|   └── MSU-pKa-test.csv    # Our test dataset.
-|
-├── src/                # Source code of our application.
-|   |
-|   ├── dataset.py          # Classes for processing PDBs and generating datasets
-|   ├── net.py              # Neural network architectures used in our project
-|   ├── embed.py            # Script that generates embeddings.
-|   └── predict.py          # Script for making predictions.
-|
-├── models/             # State dictionaries containing weights and biases of the models
-|   |
-|   ├── GSnet_default.pt    # Original pretrained GSnet.
-|   ├── GSnet_SASA.pt       # GSnet fine-tuned for SASA predictions.
-|   ├── GSnet_pKa.pt        # GSnet fine-tuned for pKa predictions.
-|   ├── aGSnet_pka.pt       # aGSnet trained for pKa predictions.
-|   └── normalization.npz   # Normalization parameters.
-|
-├── requirements.txt    # Required Python packages to run our model.
-├── setup.py            # Script for installing our model as a package.
-└── README.md           # The file you are currently reading.
-```
 
 ## Installation
 
@@ -376,6 +344,35 @@ model = Net(
 
 For more info, see the source code for the networks in `net.py`.
 
-## Generating Datasets
+## Directory Structure
 
-`...`
+Here’s a brief overview of the directory structure:
+
+```
+hydropro_ml/
+│
+├── datasets/           # Our datasets.
+|   |
+|   ├── MSU-pKa-train.csv   # Our training dataset.
+|   ├── MSU-pKa-val.csv     # Our validation dataset.
+|   └── MSU-pKa-test.csv    # Our test dataset.
+|
+├── src/                # Source code of our application.
+|   |
+|   ├── dataset.py          # Classes for processing PDBs and generating datasets
+|   ├── net.py              # Neural network architectures used in our project
+|   ├── embed.py            # Script that generates embeddings.
+|   └── predict.py          # Script for making predictions.
+|
+├── models/             # State dictionaries containing weights and biases of the models
+|   |
+|   ├── GSnet_default.pt    # Original pretrained GSnet.
+|   ├── GSnet_SASA.pt       # GSnet fine-tuned for SASA predictions.
+|   ├── GSnet_pKa.pt        # GSnet fine-tuned for pKa predictions.
+|   ├── aGSnet_pka.pt       # aGSnet trained for pKa predictions.
+|   └── normalization.npz   # Normalization parameters.
+|
+├── requirements.txt    # Required Python packages to run our model.
+├── setup.py            # Script for installing our model as a package.
+└── README.md           # The file you are currently reading.
+```
