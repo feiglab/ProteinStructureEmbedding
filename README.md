@@ -112,20 +112,35 @@ This section explains how to use our models to make predictions on protein prope
  Ensure your environment is properly set up as described in the [installation section](#installation), and you have the necessary [pre-trained models](#pretrained-models) downloaded.
 
 2. **Run the prediction script:**
- Use the command below, substituting `<path_to_pdb_file>` with your PDB file's path:
- ```bash
- python predict.py --option <path_to_pdb_file>
- ```
- Replace `--option` with either `--pka`, `--sasa`, or no option for default predictions.
- 
- 
+
+#### Default Physicochemical Properties Prediction
+- **Command:**
+```bash
+python predict.py /path/to/pdb_file.pdb
+```
+- **Sample Output:**
+```
+ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
+-2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 /path/to/pdb_file.pdb
+```
+
+#### Solvent-Accessible Surface Area (SASA) Prediction
+- **Command:**
+```bash
+python predict.py --sasa /path/to/pdb_file.pdb
+```
+- **Sample Output:**
+```
+ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE
+-2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 2.3868515E+02 /path/to/pdb_file.pdb
+```
 
 #### pKa Prediction
 - **pKa value prediction:**
 ```bash
 python predict.py --pka /path/to/pdb_file.pdb
 ```
-Note that `GSnet` is the default option. pKa predictions are more accurate with `aLCnet`. To use `aLCnet`, you must use the option `--atomic`.
+Note that `GSnet` is the default option. pKa predictions are faster and more accurate with `aLCnet`. To use `aLCnet`, you must use the option `--atomic`.
 ```bash
 python predict.py --pka --atomic /path/to/pdb_file.pdb
 ```
@@ -154,27 +169,7 @@ python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
 ...
 ```
 
-#### Default Physicochemical Properties Prediction
-- **Command:**
-```bash
-python predict.py /path/to/pdb_file.pdb
-```
-- **Sample Output:**
-```
-ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
--2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 /path/to/pdb_file.pdb
-```
 
-#### Solvent-Accessible Surface Area (SASA) Prediction
-- **Command:**
-```bash
-python predict.py --sasa /path/to/pdb_file.pdb
-```
-- **Sample Output:**
-```
-ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE
--2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 2.3868515E+02 /path/to/pdb_file.pdb
-```
 
 ### Troubleshooting
 
