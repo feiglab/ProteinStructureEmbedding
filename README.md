@@ -86,8 +86,8 @@ cd hydropro_ml
    - If you use a virtual environment, set it up and activate it before installing the packages:
 
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+conda create -n gsnet
+conda activate gsnet
 ```
 
 3. **Install required packages:**
