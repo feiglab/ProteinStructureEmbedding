@@ -4,7 +4,7 @@
 
 ### Graph Neural Network-Based Prediction
 
-This project leverages **Graph Neural Networks (GNNs)** to accelerate the computational prediction of protein properties. Our model, the `Global Structure Embedding Network (GSnet)`, is adept at predicting a variety of physicochemical properties from three-dimensional protein structures. Moreover, the application of **transfer learning** allows these models to utilize previously learned representations (_i.e._, embeddings) in new prediction tasks, even with limited specific training data. A notable feature of `GSnet`, and the related `aLCnet`, is their ability to deliver rapid and accurate predictions of experimental pKa values, achieved by pretraining on related properties and simulated pKa values, respectively. 
+This repository contains code and pre-trained weights for **Graph Neural Networks (GNNs)** that are trained for the computational prediction of protein properties. [GSnet](#gsnet) is adept at predicting a variety of physicochemical properties from three-dimensional protein structures, while [aLCnet](#alcnet) was specifically trained for residue-specific pKa prediction. Moreover, the application of **transfer learning** allows these models to utilize previously learned representations (_i.e._, embeddings) in new prediction tasks, even with limited specific training data. A notable feature of `GSnet`, and the related `aLCnet`, is their ability to deliver rapid and accurate predictions of experimental pKa values, achieved by pretraining on related properties and simulated pKa values, respectively. 
 
 Properties that these models can predict include:
 
@@ -18,8 +18,12 @@ Properties that these models can predict include:
 - $pK_a$ values
 
 <details><summary><b>Model Architecture</b></summary>
-   
+
+### GSnet
+
 ![GSNet architecture dark](https://github.com/user-attachments/assets/25b0a19e-9f4b-4868-a1dd-66e54a946831)
+
+### aLCnet
 
 ![aLCnet architecture dark](https://github.com/user-attachments/assets/e09d162d-1bc2-4047-84cb-8017b026554c)
 </details>
