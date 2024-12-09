@@ -7,7 +7,7 @@ total_memory=0
 
 for ((i=1; i<=runs; i++)); do
   # Run the command and capture statistics
-  output=$( /usr/bin/time -f "%e %U %M" ./predict.py /feig/s1/spencer/gnn/cases/time_test/500.pdb 2>&1 > /dev/null )
+  output=$( /usr/bin/time -f "%e %U %M" ./predict.py ../sample_data/time_test/500.pdb 2>&1 > /dev/null )
   
   # Extract values (Wall Clock Time, User CPU Time, Peak Memory Usage)
   wall_time=$(echo $output | awk '{print $1}')  # Seconds
