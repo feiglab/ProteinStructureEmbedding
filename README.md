@@ -94,30 +94,33 @@ This section explains how to use our models to make predictions of protein prope
 
 **Command:**
 
-    ```bash
-    python predict.py /path/to/pdb_file.pdb
-    ```
+```bash
+python predict.py /path/to/pdb_file.pdb
+```
     
 **Sample Output:**
 
-    ```
-    ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
-    -2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 /path/to/pdb_file.pdb
-    ```
+```
+ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
+-2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 /path/to/pdb_file.pdb
+```
 
 </details>
 
 <details><summary><b>Solvent-Accessible Surface Area (SASA) Prediction</b></summary>
 
 **Command:**
-    ```bash
-    python predict.py --sasa /path/to/pdb_file.pdb
-    ```
+
+```bash
+python predict.py --sasa /path/to/pdb_file.pdb
+```
+
 **Sample Output:**
-    ```
-    ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE
-    -2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 2.3868515E+02 /path/to/pdb_file.pdb
-    ```
+
+```
+ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE
+-2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 2.3868515E+02 /path/to/pdb_file.pdb
+```
 
 </details>
 
@@ -126,39 +129,39 @@ This section explains how to use our models to make predictions of protein prope
 **pKa value prediction:**
 
 **Command:**
-    ```bash
-    python predict.py --pka /path/to/pdb_file.pdb
-    ```
-    Note that `GSnet` is the default option. pKa predictions are faster and more accurate with `aLCnet`. To use `aLCnet`, you must use the option `--atomic`.
-    ```bash
-    python predict.py --pka --atomic /path/to/pdb_file.pdb
-    ```
+
+Note that  pKa predictions are faster and more accurate with `aLCnet`. To use `aLCnet`, you must use the option `--atomic`.
+
+```bash
+python predict.py --pka --atomic /path/to/pdb_file.pdb
+```
+
 **Sample Output:**
-    ```
-    7.315245148533568 LYS 4 A /path/to/pdb_file.pdb
-    3.9241322437930055 ASP 5 A /path/to/pdb_file.pdb
-    8.401511664982062 LYS 7 A /path/to/pdb_file.pdb
-    3.903559068776328 ASP 11 A /path/to/pdb_file.pdb
-    ...
-    ```
+```
+7.315245148533568 LYS 4 A /path/to/pdb_file.pdb
+3.9241322437930055 ASP 5 A /path/to/pdb_file.pdb
+8.401511664982062 LYS 7 A /path/to/pdb_file.pdb
+3.903559068776328 ASP 11 A /path/to/pdb_file.pdb
+...
+```
 
 **pKa shift prediction**
+
 **Command:**
-    ```bash
-    python predict.py --pka --shift /path/to/pdb_file.pdb
-    ```
-    or
-    ```bash
-    python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
-    ```
+
+```bash
+python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
+```
+
 **Sample Output:**
-    ```
-    -3.2247548514664315 LYS 4 A /path/to/pdb_file.pdb
-    0.024132243793005603 ASP 5 A /path/to/pdb_file.pdb
-    -2.1384883350179376 LYS 7 A /path/to/pdb_file.pdb
-    0.003559068776328278 ASP 11 A /path/to/pdb_file.pdb
-    ...
-    ```
+
+```
+-3.2247548514664315 LYS 4 A /path/to/pdb_file.pdb
+0.024132243793005603 ASP 5 A /path/to/pdb_file.pdb
+-2.1384883350179376 LYS 7 A /path/to/pdb_file.pdb
+0.003559068776328278 ASP 11 A /path/to/pdb_file.pdb
+...
+```
 
 </details>
 
