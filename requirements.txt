@@ -8,3 +8,4 @@ scipy==1.13.1
 mdtraj==1.10.1
 einops
 biopython
+pdb2pqr==3.5.2
