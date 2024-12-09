@@ -36,10 +36,9 @@ You can access the pre-print at the following link:
 
 To cite our pre-print in your work, use:
 
-Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning. *Preprint available on arXiv*. https://arxiv.org/
-
 ```bibtex
-@article
+@article{
+}
 ```
 
 </details>
