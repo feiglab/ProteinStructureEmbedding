@@ -82,12 +82,6 @@ pip install -r requirements.txt
 
 The `predict.py` script provided allows prediction of all physicochemical properties discussed above.
 
-### Steps to Make Predictions
-
-1. **Prepare your environment:** Ensure your environment is properly set up as described in the [installation section](#installation), and you have the necessary [pre-trained models](#pretrained-models) downloaded.
-
-2. **Run the prediction script:**
-
 <details><summary><b>Default Physicochemical Properties Prediction</b></summary>
 
 **Command:**
