@@ -7,7 +7,7 @@
 # Citation Information
 # ------------------------------------------------------------------------------
 # Authors: Spencer Wozniak, Giacomo Janson, Michael Feig
-# Emails: spencerwozniak@gmail.com, mfeiglab@gmail.com
+# Emails: spencerwozniak1@gmail.com, mfeiglab@gmail.com
 # Paper Title: "Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning"
 # DOI: https://doi.org/xxxxxxxx
 # GitHub: https://github.com/feiglab/hydropro_ml
