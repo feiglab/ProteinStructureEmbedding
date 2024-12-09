@@ -39,7 +39,7 @@ Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Pr
 
 ## Installation
 
-Before you can run the models and use the codebase, you need to set up your environment:
+Before you can run the models, you need to set up your environment:
 
 1. **Clone the repository:**
 
