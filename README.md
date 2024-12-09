@@ -232,7 +232,7 @@ To create a dataset:
 
 #### For GSnet:
 
-1. **Have paths to PDBs and target values stored in a CSV file (or similar)**
+1. **Have paths to PDBs and target values stored in a CSV file (or similar):**
 
 ```csv
 PDB,Target Value
@@ -243,7 +243,6 @@ PDB,Target Value
 ```
 
 2. **Generate NumPy representations of the data:**
- You should write a script like this to get NPZ files for each datapoint (row)
 
 ```python
 import numpy as np
@@ -258,6 +257,8 @@ df = pd.read_csv('/path/to/file.csv') # Read CSV file
 for i, row in df.iterrows(): 
     rep = NumpyRep(row[0]) # Create a NumpyRep for PDB
     y = float(row[1])      # Extract target value
+
+    # We want to generate NPZ files for each datapoint
     np.savez(
         f'{outdir}/{i}.npz', # Define output file path
         label = y,           # Define target value
@@ -268,8 +269,7 @@ for i, row in df.iterrows():
     )
 ```
 
-3. **Generate a dataset:**
- You can then generate a PyTorch dataset like this
+3. **Generate a PyTorch dataset:**
 
 ```python
 import numpy as np
@@ -285,7 +285,7 @@ dataset = ProteinDataset(
 
 #### For aLCnet:
 
-1. **Have paths to PDBs, residue indicies, and target values stored in a CSV file (or similar)**
+1. **Have paths to PDBs, residue indicies, and target values stored in a CSV file (or similar):**
 
 ```csv
 PDB,Res,Target Value
@@ -296,7 +296,6 @@ PDB,Res,Target Value
 ```
 
 2. **Generate NumPy representations of the data:**
- You should write a script like this to get NPZ files for each datapoint (row)
 
 ```python
 import numpy as np
@@ -311,6 +310,8 @@ df = pd.read_csv('/path/to/file.csv') # Read CSV file
 for i, row in df.iterrows(): 
     rep = NumpyRep_atomic(row[0],row[1]) # Create a NumpyRep for residue in PDB
     y = float(row[2])                    # Extract target value
+
+    # We want to generate NPZ files for each datapoint
     np.savez(
         f'{outdir}/{i}.npz',             # Define output file path
         label = y,                       # Define target value
@@ -323,8 +324,7 @@ for i, row in df.iterrows():
     )
 ```
 
-3. **Generate a dataset:**
- You can then generate a PyTorch dataset like this
+3. **Generate a PyTorch dataset:**
 
 ```python
 import numpy as np
