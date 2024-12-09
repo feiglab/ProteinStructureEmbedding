@@ -33,11 +33,9 @@ Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Pr
 - [Making Predictions](#making-predictions)
 - [Pretrained Models](#pretrained-models)
 - [Generating Embeddings](#generating-embeddings)
-- [Implementing our Networks](#implementing-our-networks)
 - [Generating Datasets](#generating-datasets)
+- [Training a Model](#training-a-model)
 - [Directory Structure](#directory-structure)
-
-
 
 ## Installation
 
@@ -224,6 +222,22 @@ This section describes how to generate embeddings for all PDB files within a spe
 ### Notes
 
 - The scripts utilize multiprocessing to expedite the embedding process. Ensure your system has adequate resources to handle multiple processes simultaneously.
+
+## Generating Datasets
+
+The `dataset.py` script allows the creation of datasets for both GSnet and aLCnet via `NumpyRep` and `NumpyRep_atomic`, respectively, then via `ProteinDataset` and `AtomicDataset` classes, respectively.
+
+To create a dataset:
+
+1.
+
+## Training a Model
+
+Sample training scripts `train_GSnet.py` and `train_aLCnet.py` are provided for training GSnet and aLCnet, respectively.
+
+To train a new model:
+
+1. 
 
 ## More info
 
