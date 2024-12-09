@@ -229,10 +229,11 @@ The `dataset.py` script allows the creation of datasets for both GSnet and aLCne
 
 To create a dataset:
 
-1. Generate NumPy representations of the data.
+
 
 #### For GSnet:
 
+1. Have paths to PDBs and target values stored in a CSV file (or similar)
 Imagine you have a CSV file like this:
 
 ```csv
@@ -243,6 +244,7 @@ PDB,Target Value
 ...
 ```
 
+2. Generate NumPy representations of the data.
 You should write a script like this to get NPZ files for each datapoint (row)
 
 ```python
@@ -269,6 +271,7 @@ for i, row in df.iterrows():
     )
 ```
 
+3. Generate a dataset
 You can then generate a PyTorch dataset like this:
 
 ```python
