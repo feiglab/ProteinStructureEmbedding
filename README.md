@@ -25,7 +25,7 @@ Properties that these models can predict include:
 
 ### aLCnet
 
-![aLCnet architecture dark](https://github.com/user-attachments/assets/727838b7-8e88-43cb-92e9-b8588a069634)
+![aLCnet architecture dark](https://github.com/user-attachments/assets/be72981f-f494-4bf0-a781-8a1de175171b)
 </details>
 
 <details><summary><b>Paper</b></summary>
