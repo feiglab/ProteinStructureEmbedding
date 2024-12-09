@@ -17,7 +17,7 @@ Properties that these models can predict include:
 - Solvent accessible surface area ($SASA$)
 - $pK_a$ values
 
-<details><summary><b>Model Architecture</b></summary>
+<details open><summary><b>Model Architecture</b></summary>
 
 ### GSnet
 
@@ -25,7 +25,7 @@ Properties that these models can predict include:
 
 ### aLCnet
 
-![aLCnet architecture dark](https://github.com/user-attachments/assets/e09d162d-1bc2-4047-84cb-8017b026554c)
+![aLCnet architecture dark](https://github.com/user-attachments/assets/727838b7-8e88-43cb-92e9-b8588a069634)
 </details>
 
 <details><summary><b>Paper</b></summary>
