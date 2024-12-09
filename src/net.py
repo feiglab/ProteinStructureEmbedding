@@ -397,6 +397,9 @@ class Net(nn.Module):
 
             h = h + interaction(h, edge_index, edge_weight, edge_attr) # Make EGNN.forward() take these same args.
 
+        if self.embedding_only:
+            return h
+        
         # Mean pooling
         if resid is None:
             h = scatter(h, batch, dim=0, reduce=self.readout)
@@ -436,9 +439,6 @@ class Net(nn.Module):
         if input_feats is not None:
             input_feats = input_feats.to(self.param.device)
             h = torch.cat([input_feats,h],dim=1)
-
-        if self.embedding_only:
-            return h
 
         # Fully Connected
         if not self.use_transfer:

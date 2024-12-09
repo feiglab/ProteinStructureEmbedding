@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Simple script that generates embeddings for all PDBs in a directory and saves them in another directory.
+# Script to generate embeddings for PDBs in a directory, with protein- or residue-specific options.
 #
 # USAGE:
-# python embed.py PDBPATH OUTPATH
+# python embed.py --protein/--residue PDBPATH OUTPATH
 #
 # ------------------------------------------------------------------------------
 # Citation Information
@@ -20,61 +20,85 @@
 
 import sys
 import torch
-import pickle
 import os
+import argparse
 import multiprocessing as mp
 from net import Net
 from dataset import NumpyRep
 
-def validate_arguments():
+def validate_arguments(args):
     """
-    Validate the command line arguments.
+    Validate the command-line arguments.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        The parsed arguments.
 
     Raises
     ------
     ValueError
-        If the number of arguments is not equal to 3.
+        If neither or both `--protein` and `--residue` are specified.
     """
-    if len(sys.argv) != 3:
-        raise ValueError('USAGE: ./embed.py PDBPATH OUTPATH')
+    if not args.protein and not args.residue:
+        raise ValueError("You must specify either --protein or --residue.")
+    if args.protein and args.residue:
+        raise ValueError("You cannot specify both --protein and --residue.")
 
-def load_model(device):
+def load_model(device, mode):
     """
-    Load and initialize the neural network model with predefined parameters.
+    Load and initialize the neural network model based on the mode.
 
     Parameters
     ----------
     device : torch.device
         The device to run the model on (CPU or GPU).
+    mode : str
+        Either 'protein' or 'residue' to determine the model behavior.
 
     Returns
     -------
     net : Net
         The initialized neural network model.
     """
-    net = Net(embedding_only=True,
-              residue_pred=True,
-              residue_pooling=False,
-              global_mean=True,
-              env_thresh=[6, 8, 10, 12, 15],
-              hidden_channels=150,
-              num_filters=150,
-              num_interactions=6,
-              num_gaussians=300,
-              cutoff=15.0,
-              max_num_neighbors=150,
-              readout='mean',
-              activation='ssp',
-              cc_embedding='rbf',
-              gnn_layer='transformerconv',
-              heads=1,
-              mlp_activation='relu',
-              standardize_cc=True,
-              layernorm=False,
-              advanced_residual=True)
+    if mode == "protein":
+        net = Net(embedding_only=True,
+                  hidden_channels=150,
+                  num_filters=150,
+                  num_interactions=6,
+                  num_gaussians=300,
+                  cutoff=15.0,
+                  max_num_neighbors=150,
+                  readout='mean',
+                  activation='ssp',
+                  cc_embedding='rbf',
+                  heads=1,
+                  mlp_activation='relu',
+                  standardize_cc=True,
+                  advanced_residual=True)
+        state_dict = '../models/GSnet_default.pt'
 
-    model_dir = '../models'
-    state_dict = '/feig/s1/spencer/gnn/main/models/pka_from_sasa_res.pt'
+    elif mode == "residue":
+        net = Net(embedding_only=True,
+                  residue_pred=True,
+                  residue_pooling=False,
+                  global_mean=True,
+                  env_thresh=[6,8,10,12,15],
+                  hidden_channels=150,
+                  num_filters=150,
+                  num_interactions=6,
+                  num_gaussians=300,
+                  cutoff=15.0,
+                  max_num_neighbors=64,
+                  readout='mean',
+                  activation='ssp',
+                  cc_embedding='rbf',
+                  heads=1,
+                  mlp_activation='relu',
+                  standardize_cc=True,
+                  advanced_residual=True)
+        state_dict = '../models/GSnet_pKa.pt'
+
     dict1 = torch.load(state_dict, map_location=device)
     todel = [d for d in dict1 if 'fc' in d]
 
@@ -113,7 +137,7 @@ def create_embedding(pdb, net, device, out_path):
 
         # Get embedding and save
         embedding = net(pos, a, cc, dh)
-        print(embedding.shape)
+        #print(embedding.shape)
         torch.save(embedding, f'{out_path}/{name}.pt')
     except Exception as e:
         print(f'Error loading {pdb}: {e}')
@@ -137,32 +161,32 @@ def process_pdbs(pdb_path, out_path, net, device):
     with mp.Pool() as pool:
         pool.starmap(create_embedding, [(pdb, net, device, out_path) for pdb in pdbs])
 
-def main(pdb_path, out_path):
+def main():
     """
-    Main function to load the model and process PDB files.
+    Main function to parse arguments, load the model, and process PDB files.
+    """
+    parser = argparse.ArgumentParser(description="Generate embeddings for PDBs using GSnet.")
+    parser.add_argument("--protein", action="store_true", help="Use protein-specific embedding mode.")
+    parser.add_argument("--residue", action="store_true", help="Use residue-specific embedding mode.")
+    parser.add_argument("PDBPATH", type=str, help="Path to the directory containing PDB files.")
+    parser.add_argument("OUTPATH", type=str, help="Path to the directory to save embeddings.")
+    args = parser.parse_args()
 
-    Parameters
-    ----------
-    pdb_path : str
-        The input directory containing PDB files.
-    out_path : str
-        The output directory to save the embeddings.
-    """
     try:
+        validate_arguments(args)
+        mode = "protein" if args.protein else "residue"
+        pdb_path = args.PDBPATH
+        out_path = args.OUTPATH
+
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        net = load_model(device)
+        net = load_model(device, mode)
         process_pdbs(pdb_path, out_path, net, device)
-    except Exception as e:
-        print(f"Error: {e}")
 
-if __name__ == '__main__':
-    try:
-        validate_arguments()
-        pdb_path = sys.argv[1]
-        out_path = sys.argv[2]
-        main(pdb_path, out_path)
     except ValueError as ve:
         print(f"Argument Error: {ve}")
     except Exception as e:
         print(f"Unexpected Error: {e}")
+
+if __name__ == '__main__':
+    main()
 
