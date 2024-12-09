@@ -92,11 +92,11 @@ This section explains how to use our models to make predictions of protein prope
 
 <details><summary><b>Default Physicochemical Properties Prediction</b></summary>
 
-- **Command:**
+**Command:**
     ```bash
     python predict.py /path/to/pdb_file.pdb
     ```
-- **Sample Output:**
+**Sample Output:**
     ```
     ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
     -2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 /path/to/pdb_file.pdb
@@ -106,11 +106,11 @@ This section explains how to use our models to make predictions of protein prope
 
 <details><summary><b>Solvent-Accessible Surface Area (SASA) Prediction</b></summary>
 
-- **Command:**
+**Command:**
     ```bash
     python predict.py --sasa /path/to/pdb_file.pdb
     ```
-- **Sample Output:**
+**Sample Output:**
     ```
     ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE
     -2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 2.3868515E+02 /path/to/pdb_file.pdb
@@ -121,7 +121,8 @@ This section explains how to use our models to make predictions of protein prope
 <details><summary><b>pKa Prediction</b></summary>
 
 **pKa value prediction:**
-- **Command:**
+
+**Command:**
     ```bash
     python predict.py --pka /path/to/pdb_file.pdb
     ```
@@ -129,7 +130,7 @@ This section explains how to use our models to make predictions of protein prope
     ```bash
     python predict.py --pka --atomic /path/to/pdb_file.pdb
     ```
-- **Sample Output:**
+**Sample Output:**
     ```
     7.315245148533568 LYS 4 A /path/to/pdb_file.pdb
     3.9241322437930055 ASP 5 A /path/to/pdb_file.pdb
@@ -139,7 +140,7 @@ This section explains how to use our models to make predictions of protein prope
     ```
 
 **pKa shift prediction**
-- **Command:**
+**Command:**
     ```bash
     python predict.py --pka --shift /path/to/pdb_file.pdb
     ```
@@ -147,7 +148,7 @@ This section explains how to use our models to make predictions of protein prope
     ```bash
     python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
     ```
-- **Sample Output:**
+**Sample Output:**
     ```
     -3.2247548514664315 LYS 4 A /path/to/pdb_file.pdb
     0.024132243793005603 ASP 5 A /path/to/pdb_file.pdb
