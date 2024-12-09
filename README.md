@@ -188,6 +188,8 @@ optional arguments:
 
 This section describes how to generate embeddings for all PDB files within a specified directory. Embeddings are crucial for downstream prediction tasks and can be saved for subsequent use.
 
+- Generated embeddings (via either method) will be saved as tensors of shape `[N,d]` where `N` is the number of residues in the protein and `d` is the embedding dimension.
+
 ### Steps to Generate Embeddings
 
 1. **Prepare your environment:**
