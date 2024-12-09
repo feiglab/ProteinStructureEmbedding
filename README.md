@@ -66,8 +66,6 @@ conda activate gsnet
 pip install -r requirements.txt
 ```
 
-
-
 ## Making Predictions
 
 ### Overview
@@ -205,27 +203,27 @@ This section describes how to generate embeddings for all PDB files within a spe
 - Use the `--protein` option to generate GSnet embeddings optimized for **whole protein predictions** (trained on 6 physicochemical properties).
 - Use the `--residue` option to generate GSnet embeddings optimized for **residue-specific predictions** (fine-tuned on rSASA and pKa).
 
-### Example Command
+### Examples
+
+If I am attempting to use GSnet embeddings for making protein-level pI predictions, I would run:
 
 ```bash
 python embed.py --protein /path/to/pdb /path/to/output
 ```
 
-This command processes all PDB files, with the GSnet optimized for whole protein predictions, in `/path/to/pdb` and saves the resulting embeddings in `/path/to/output`. 
+- This command processes all PDB files, with the GSnet optimized for whole protein predictions, in `/path/to/pdb` and saves the resulting embeddings in `/path/to/output`. 
 
-### Troubleshooting
+If I am attempting to use GSnet embeddings to predict whether a residue is involved in the active site of an enzyme, I would run:
 
-- Ensure that the paths provided are correct and accessible.
-- Verify that the pre-trained model file is in the correct directory and properly named.
-- Check your Python environment if you encounter dependencies errors.
-- If the script fails with a CUDA error and you are running on a GPU, ensure that your device has sufficient memory and is compatible.
+```bash
+python embed.py --residue /path/to/pdb /path/to/output
+```
+
+- This command processes all PDB files, with the GSnet optimized for residue-level predictions, in `/path/to/pdb` and saves the resulting embeddings in `/path/to/output`. 
 
 ### Notes
 
 - The script utilizes multiprocessing to expedite the embedding process. Ensure your system has adequate resources to handle multiple processes simultaneously.
-- The embedding process can be sensitive to the structure and quality of the input PDB files. The scripts will automatically attempt to clean and process broken PDB files, but it may not always work. Please ensure that the files you use are correctly formatted and contain all necessary information.
-
-This method of generating embeddings is integral to leveraging the predictive power of our GNN models for analyzing protein structures.
 
 ## More info
 
