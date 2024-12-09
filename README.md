@@ -139,15 +139,6 @@ python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
 ...
 ```
 
-
-
-### Troubleshooting
-
-- Ensure all paths are correct and the necessary files are accessible.
-- Verify that the pre-trained model files are in the correct directory and are properly named.
-- Check your Python environment if you encounter dependency errors.
-- If the script fails with a CUDA error and you are running on a GPU, make sure your device has sufficient memory and is compatible.
-
 ### Notes
 
 - The script is capable of handling multiple input files and can process them in batches if specified.
@@ -209,17 +200,20 @@ This section describes how to generate embeddings for all PDB files within a spe
 2. **Run the script:**
  Navigate to the `src/` directory in your terminal. Use the following command to generate embeddings:
  ```bash
- python embed.py <path_to_PDB_files> <output_path_for_embeddings>
+ python embed.py --protein/--residue <path_to_PDB_files> <output_path_for_embeddings>
  ```
  Replace `<path_to_PDB_files>` with the directory containing your PDB files and `<output_path_for_embeddings>` with the directory where you want to save the embeddings.
+
+- Using the `--protein` option uses the GSnet optimized for whole protein predictions.
+- Using the `--residue` option uses the GSnet optimized for ressidue-specific predictions.
 
 ### Example Command
 
 ```bash
-python embed.py /path/to/pdb /path/to/output
+python embed.py --protein /path/to/pdb /path/to/output
 ```
 
-This command processes all PDB files in `/path/to/pdb` and saves the resulting embeddings in `/path/to/output`.
+This command processes all PDB files, with the GSnet optimized for whole protein predictions, in `/path/to/pdb` and saves the resulting embeddings in `/path/to/output`. 
 
 ### Troubleshooting
 
