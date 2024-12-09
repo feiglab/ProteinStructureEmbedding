@@ -4,7 +4,7 @@
 
 ### Graph Neural Network-Based Prediction
 
-This repository contains code and pre-trained weights for **Graph Transformer Networks** that are trained for the computational prediction of protein properties. **[GSnet](#gsnet)** is adept at predicting a variety of physicochemical properties from three-dimensional protein structures, while **[aLCnet](#alcnet)** was specifically trained for residue-specific pKa prediction. Moreover, the application of **transfer learning** allows these models to utilize previously learned representations (_i.e._, **embeddings**) in new prediction tasks, even with limited specific training data.
+This repository contains code and pre-trained weights for **[Graph Transformer Networks](https://pytorch-geometric.readthedocs.io/en/2.5.1/generated/torch_geometric.nn.conv.TransformerConv.html)** that are trained for the computational prediction of protein properties. **[GSnet](#gsnet)** is adept at predicting a variety of physicochemical properties from three-dimensional protein structures, while **[aLCnet](#alcnet)** was specifically trained for residue-specific pKa prediction. Moreover, the application of **[transfer learning](https://en.wikipedia.org/wiki/Transfer_learning)** allows these models to utilize previously learned representations (_i.e._, **embeddings**) in new prediction tasks, even with limited specific training data.
 
 Properties that these models can predict include:
 
@@ -37,6 +37,11 @@ You can access the pre-print at the following link:
 To cite our pre-print in your work, use:
 
 Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning. *Preprint available on arXiv*. https://arxiv.org/
+
+```bibtex
+@article
+```
+
 </details>
 
 
