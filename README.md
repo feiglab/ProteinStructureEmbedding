@@ -4,7 +4,7 @@
 
 ### Graph Neural Network-Based Prediction
 
-This project leverages **Graph Neural Networks (GNNs)** to accelerate the computational prediction of protein properties. Our model, the `Global Structure Embedding Network (GSnet)`, is adept at predicting a variety of physicochemical properties from three-dimensional protein structures. Moreover, the application of **transfer learning** allows these models to utilize previously learned representations (_i.e._, embeddings) in new prediction tasks, even with limited specific training data. A notable feature of `GSnet`, and the related `aLCnet`, is their ability to deliver rapid and accurate predictions of experimental p_Ka_ values, achieved by pretraining on related properties and simulated p_Ka_ values, respectively. 
+This project leverages **Graph Neural Networks (GNNs)** to accelerate the computational prediction of protein properties. Our model, the `Global Structure Embedding Network (GSnet)`, is adept at predicting a variety of physicochemical properties from three-dimensional protein structures. Moreover, the application of **transfer learning** allows these models to utilize previously learned representations (_i.e._, embeddings) in new prediction tasks, even with limited specific training data. A notable feature of `GSnet`, and the related `aLCnet`, is their ability to deliver rapid and accurate predictions of experimental pKa values, achieved by pretraining on related properties and simulated pKa values, respectively. 
 
 Properties that these models can predict include:
 
