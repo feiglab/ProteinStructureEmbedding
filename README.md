@@ -80,9 +80,7 @@ pip install -r requirements.txt
 
 ## Making Predictions
 
-### Overview
-
-This section explains how to use our models to make predictions of protein properties such as pKa values and other physicochemical properties from protein structures. The steps below include how to run the script with different options to predict specific properties.
+The `predict.py` script provided allows prediction of all physicochemical properties discussed above.
 
 ### Steps to Make Predictions
 
@@ -214,9 +212,7 @@ optional arguments:
 
 ## Generating Embeddings
 
-### Overview
-
-This section describes how to generate embeddings for all PDB files within a specified directory. Embeddings are crucial for downstream prediction tasks and can be saved for subsequent use.
+This section describes how to generate embeddings for all PDB files within a specified directory.
 
 - Generated embeddings (via either method) will be saved as tensors of shape `[N,d]` where `N` is the number of residues in the protein and `d` is the embedding dimension.
 
