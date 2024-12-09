@@ -138,7 +138,11 @@ for param in net.parameters():
     param.requires_grad = False # Set to true if optimizing the GNN itself
 
 # Allow output MLP to optimize
-for param in net.fc_t: # 'fc_t' is an MLP for transfer learning only
+# 'fc_t' is an MLP for transfer learning only
+# When Net(use_transfer=True):
+# 'fc_t' output MLP layers will be used
+# rather than 'fc' layers.
+for param in net.fc_t:
     try:
         param.weight.requires_grad = True
     except:
