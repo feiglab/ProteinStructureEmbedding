@@ -407,7 +407,6 @@ class ProteinDataset(Dataset):
         std (float, optional): Standard deviation for normalization. Defaults to None.
         use_dh (bool, optional): Whether to use DH feature. Defaults to False.
         use_cc (bool, optional): Whether to use CC feature. Defaults to False.
-        use_pI (bool, optional): Whether to use pI feature. Defaults to False.
         use_res (bool, optional): Whether to use residue feature. Defaults to False.
         use_mask (bool, optional): Whether to use mask feature. Defaults to False.
         use_weight (bool, optional): Whether to use weight feature. Defaults to False.
@@ -419,16 +418,15 @@ class ProteinDataset(Dataset):
         add_to_mask (bool, optional): Whether to add an additional value to the mask. Defaults to False.
         dG_index (bool, optional): Whether to use dG index feature. Defaults to False.
         use_cofactors (bool, optional): Whether to use cofactors feature. Defaults to False.
-        nmr (str, optional): NMR configuration. Defaults to None.
+        nmr (str, optional): NMR configuration. You can choose "random" or "all" structures of an ensemble Defaults to None.
     """
-    def __init__(self, root, avg=None, std=None, use_dh=False, use_cc=False, use_pI=False, use_res=False, use_mask=False, use_weight=False, normalize=True, label0=False, check_files=False, skip_bad_files=False, dont_use=None, add_to_mask=False, dG_index=False, use_cofactors=False, nmr=None):
+    def __init__(self, root, avg=None, std=None, use_dh=False, use_cc=False, use_res=False, use_mask=False, use_weight=False, normalize=True, label0=False, check_files=False, skip_bad_files=False, dont_use=None, add_to_mask=False, dG_index=False, use_cofactors=False, nmr=None):
         super(ProteinDataset, self).__init__()
         self.root = root
         self.avg = avg
         self.std = std
         self.use_dh = use_dh
         self.use_cc = use_cc
-        self.use_pI = use_pI
         self.use_res = use_res
         self.use_mask = use_mask
         self.use_weight = use_weight
@@ -576,6 +574,9 @@ class ProteinDataset(Dataset):
 
 
 class _ProteinDataset(ProteinDataset):
+    """
+    Modified ProteinDataset class for handling data with multi-dimensional target values.
+    """
     def normalize(self):
         data = []
         for f in self.filelist:
