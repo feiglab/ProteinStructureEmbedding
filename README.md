@@ -72,11 +72,9 @@ This section explains how to use our models to make predictions on protein prope
 
 ### Steps to Make Predictions
 
-1. **Prepare your environment**
+1. **Prepare your environment:** Ensure your environment is properly set up as described in the [installation section](#installation), and you have the necessary [pre-trained models](#pretrained-models) downloaded.
 
-Ensure your environment is properly set up as described in the [installation section](#installation), and you have the necessary [pre-trained models](#pretrained-models) downloaded.
-
-3. **Run the prediction script:**
+2. **Run the prediction script:**
 
 #### Default Physicochemical Properties Prediction
 - **Command:**
@@ -234,18 +232,17 @@ To create a dataset:
 
 #### For GSnet:
 
-1. Have paths to PDBs and target values stored in a CSV file (or similar)
- Imagine you have a CSV file like this:
+1. **Have paths to PDBs and target values stored in a CSV file (or similar)**
 
 ```csv
 PDB,Target Value
-/path/to/file1.pdb, 4.10
-/path/to/file2.pdb, 6.21
-/path/to/file3.pdb, 7.94
+/path/to/file1.pdb,4.10
+/path/to/file2.pdb,6.21
+/path/to/file3.pdb,7.94
 ...
 ```
 
-2. Generate NumPy representations of the data.
+2. **Generate NumPy representations of the data:**
  You should write a script like this to get NPZ files for each datapoint (row)
 
 ```python
@@ -263,7 +260,6 @@ for i, row in df.iterrows():
     y = float(row[1])      # Extract target value
     np.savez(
         f'{outdir}/{i}.npz', # Define output file path
-        p = i,               # Define index
         label = y,           # Define target value
         x = rep.x,           # Define Cartesian coordinates of residues
         a = rep.get_aas(),   # Define residue types
@@ -272,8 +268,8 @@ for i, row in df.iterrows():
     )
 ```
 
-3. Generate a dataset
- You can then generate a PyTorch dataset like this:
+3. **Generate a dataset:**
+ You can then generate a PyTorch dataset like this
 
 ```python
 import numpy as np
@@ -287,16 +283,58 @@ dataset = ProteinDataset(
 )
 ```
 
-For aLCnet:
+#### For aLCnet:
+
+1. **Have paths to PDBs, residue indicies, and target values stored in a CSV file (or similar)**
+
+```csv
+PDB,Res,Target Value
+/path/to/file1.pdb,24,4.10
+/path/to/file2.pdb,54,6.21
+/path/to/file3.pdb,91,7.94
+...
+```
+
+2. **Generate NumPy representations of the data:**
+ You should write a script like this to get NPZ files for each datapoint (row)
 
 ```python
 import numpy as np
+import pandas as pd
 from dataset import NumpyRep_atomic
 
+outdir = '/path/to/output/dir'
 
+df = pd.read_csv('/path/to/file.csv') # Read CSV file
+
+# Iterate over datapoints in dataset (this can be expidited with multiprocessing)
+for i, row in df.iterrows(): 
+    rep = NumpyRep_atomic(row[0],row[1]) # Create a NumpyRep for residue in PDB
+    y = float(row[2])                    # Extract target value
+    np.savez(
+        f'{outdir}/{i}.npz',             # Define output file path
+        label = y,                       # Define target value
+        x = rep.x,                       # Define Cartesian coordinates of residues
+        a = rep.a,                       # Define residue types
+        atoms = rep.atoms,               # Define atom types
+        charge = rep.charge,             # Define atom charges
+        resid_atomic=rep.resid_atomic,   # Define residue atom indicies
+        resid_ca=rep.resid_ca,           # Define alpha-carbon index
+    )
 ```
 
-2. 
+3. **Generate a dataset:**
+ You can then generate a PyTorch dataset like this
+
+```python
+import numpy as np
+from dataset import AtomicDataset
+
+dataset = AtomicDataset(
+    root='/path/to/output/dir', # Path to directory containing NPZ files
+    normalize=True              # Normalize target values
+)
+```
 
 ## Training a Model
 
