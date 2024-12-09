@@ -593,7 +593,9 @@ def select_device(args):
     torch.device
         The device to use for computation.
     """
-    return torch.device('cuda:4' if torch.cuda.is_available() and not args.cpu else 'cpu')
+    if args.gpu:
+        assert torch.cuda.is_available(), 'You selected --gpu but no GPUs were detected on your system.'
+    return torch.device('cuda' if torch.cuda.is_available() and not args.cpu else 'cpu')
 
 
 def load_normalization_parameters(args, model_dir):
