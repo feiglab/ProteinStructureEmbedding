@@ -46,8 +46,8 @@ Before you can run the models and use the codebase, you need to set up your envi
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/your-repository/hydropro_ml.git
-cd hydropro_ml
+git clone https://github.com/feiglab/ProteinStructureEmbedding.git
+cd ProteinStructureEmbedding
 ```
 
 2. **Set up the environment:**
