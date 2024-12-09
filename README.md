@@ -372,7 +372,8 @@ hydropro_ml/
 |   ├── embed_GSnet.py      # Script that generates GSnet embeddings.
 |   ├── embed_aLCnet.py     # Script that generates aLCnet embeddings.
 |   ├── train_GSnet.py      # Script for training GSnet.
-|   └── train_aLCnet.py     # Script for training aLCnet.
+|   ├── train_aLCnet.py     # Script for training aLCnet.
+|   └── time.sh             # Script for timing the running of a script.
 |
 ├── models/             # State dictionaries containing weights and biases of the models
 |   |
