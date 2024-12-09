@@ -145,8 +145,6 @@ python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
 - For detailed error messages and troubleshooting, the script outputs logs that can be checked in case of failures.
 - Remember to use the cleaning options if your PDB files might contain non-standard residues or formats.
 
-These methods allow for the flexible application of our models to a variety of prediction tasks in protein analysis.
-
 For a full description of the utility of the `predict.py` script, you can run `python predict.py -h` or `python predict.py --help`:
 
 ```
@@ -190,7 +188,7 @@ optional arguments:
 
 ### Overview
 
-This section describes how to generate embeddings for all PDB files within a specified directory. Embeddings are crucial for downstream prediction tasks and are saved for subsequent use.
+This section describes how to generate embeddings for all PDB files within a specified directory. Embeddings are crucial for downstream prediction tasks and can be saved for subsequent use.
 
 ### Steps to Generate Embeddings
 
@@ -204,8 +202,8 @@ This section describes how to generate embeddings for all PDB files within a spe
  ```
  Replace `<path_to_PDB_files>` with the directory containing your PDB files and `<output_path_for_embeddings>` with the directory where you want to save the embeddings.
 
-- Using the `--protein` option uses the GSnet optimized for whole protein predictions.
-- Using the `--residue` option uses the GSnet optimized for ressidue-specific predictions.
+- Use the `--protein` option to generate GSnet embeddings optimized for **whole protein predictions** (trained on 6 physicochemical properties).
+- Use the `--residue` option to generate GSnet embeddings optimized for **residue-specific predictions** (fine-tuned on rSASA and pKa).
 
 ### Example Command
 
