@@ -115,7 +115,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='ML prediction on PDB files')
     parser.add_argument('--clean', action='store_true', help='Clean PDB files before making predictions.')
     parser.add_argument('--pka', action='store_true', help='Predict pKa.')
-    parser.add_argument('--atomic', action='store_true', help='Use a-GSnet for pKa predictions')
+    parser.add_argument('--atomic', action='store_true', help='Use aLCnet for pKa predictions')
     parser.add_argument('--sasa', action='store_true', help='Predict SASA.')
     parser.add_argument('--shift', action='store_true', help='Calculate pKa shift (relative to standard value).')
     parser.add_argument('--chain', metavar='chain', help='Specify chain.')
@@ -222,7 +222,7 @@ def load_models(args, device):
                               advanced_residual = True,   # Create residual connections?
                               one_hot_res       = False,  # Append one-hot residue encoding to FC?
                             )
-            state_dict = torch.load(f'{model_dir}/aGSnet_pka.pt', map_location=device)
+            state_dict = torch.load(f'{model_dir}/aLCnet_pka.pt', map_location=device)
             models['gnn'].load_state_dict(state_dict, strict=False)
     elif args.sasa:
         models['gnn'] = Net(embedding_only=True)
