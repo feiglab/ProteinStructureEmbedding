@@ -126,9 +126,9 @@ python predict.py --sasa /path/to/pdb_file.pdb
 
 <details><summary><b>pKa value prediction</b></summary>
 
-**Command:**
+Note that pKa predictions are faster and more accurate with `aLCnet`. To use `aLCnet`, you must use the option `--atomic`.
 
-Note that  pKa predictions are faster and more accurate with `aLCnet`. To use `aLCnet`, you must use the option `--atomic`.
+**Command:**
 
 ```bash
 python predict.py --pka --atomic /path/to/pdb_file.pdb
@@ -145,6 +145,8 @@ python predict.py --pka --atomic /path/to/pdb_file.pdb
 </details>
 
 <details><summary><b>pKa shift prediction</b></summary>
+
+Note that pKa predictions are faster and more accurate with `aLCnet`. To use `aLCnet`, you must use the option `--atomic`.
 
 **Command:**
 
