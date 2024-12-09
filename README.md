@@ -358,7 +358,7 @@ Here’s a brief overview of the directory structure:
 ```
 hydropro_ml/
 │
-├── datasets/           # Our datasets.
+├── datasets/           # Our datasets for pKa training.
 |   |
 |   ├── MSU-pKa-train.csv   # Our training dataset.
 |   ├── MSU-pKa-val.csv     # Our validation dataset.
@@ -382,7 +382,12 @@ hydropro_ml/
 |   ├── aLCnet_pka.pt       # aLCnet trained for pKa predictions.
 |   └── normalization.npz   # Normalization parameters.
 |
+├── sample_data/        # Sample data provided for running certain scripts
+|   |
+|   ├── time_test/          # Directory containing PDB structures used to test the speed of GSnet
+|   ├── GSnet/              # Directory containing sample training and test sets for retraining GSnet.
+|   └── aLCnet/             # Directory containing sample training and test sets for retraining aLCnet.
+|
 ├── requirements.txt    # Required Python packages to run our model.
-├── setup.py            # Script for installing our model as a package.
 └── README.md           # The file you are currently reading.
 ```
