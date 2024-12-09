@@ -93,10 +93,13 @@ This section explains how to use our models to make predictions of protein prope
 <details><summary><b>Default Physicochemical Properties Prediction</b></summary>
 
 **Command:**
+
     ```bash
     python predict.py /path/to/pdb_file.pdb
     ```
+    
 **Sample Output:**
+
     ```
     ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
     -2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 /path/to/pdb_file.pdb
