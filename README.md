@@ -30,11 +30,11 @@ Properties that these models can predict include:
 
 <details><summary><b>Paper</b></summary>
 
-You can access the pre-print at the following link:
+For more information about this project, you can access the pre-print at the following link:
 
 [Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning](https://arxiv.org/)
 
-To cite our pre-print in your work, use:
+To cite our project in your work, use:
 
 ```bibtex
 @article{
