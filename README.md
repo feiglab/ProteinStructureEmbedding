@@ -17,14 +17,14 @@ Properties that these models can predict include:
 - Solvent accessible surface area ($SASA$)
 - $pK_a$ values
 
-<details><summary><h2>Model Architecture</h2></summary>
+<details><summary><h4>Model Architecture</h4></summary>
    
 ![GSNet architecture dark](https://github.com/user-attachments/assets/25b0a19e-9f4b-4868-a1dd-66e54a946831)
 
 ![aLCnet architecture dark](https://github.com/user-attachments/assets/e09d162d-1bc2-4047-84cb-8017b026554c)
 </details>
 
-<details><summary><h2>Paper</h2></summary>
+<details><summary><h4>Paper</h4></summary>
 
 You can access the pre-print at the following link:
 
@@ -36,7 +36,7 @@ Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Pr
 </details>
 
 
-<details open><summary><h2>Table of Contents</h2></summary>
+<details open><summary><h4>Table of Contents</h4></summary>
 
 - [Installation](#installation)
 - [Making Predictions](#making-predictions)
