@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+#
+# Sample training script for GSnet
+#
+#  Sample data has been provided with 100 IDP structures
+#  in both the training and test set for predicting the 
+#  original 6 target values.
+#
+
 # Essential Imports
 import os
 import sys
@@ -74,15 +82,15 @@ def validate(m):
         loss_sum += loss
     return float( loss_sum / len(test_loader) )
 
-# Load train data
-train_data = ProteinDataset(root='/feig/s1/spencer/gnn/data/pdb/dG_comparison/processed/test/',
+# Load train data (using sample data for 100 IDP structures)
+train_data = ProteinDataset(root='../sample_data/GSnet/train',
                            normalize=True,
                            use_dh=True,
                            use_cc=True,
                           )
 
-# Load test data
-test_data = ProteinDataset(root='/feig/s1/spencer/gnn/data/pdb/dG_comparison/processed/test/',
+# Load test data (using sample data for 100 IDP structures)
+test_data = ProteinDataset(root='../sample_data/GSnet/test/',
                            avg=train_data.avg,
                            std=train_data.std,
                            normalize=False,
@@ -99,7 +107,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Initialize network
 net = Net(use_transfer      = True,      # Transfer learning
-          out_channels_t    = 1,         # Number of output channels
+          out_channels_t    = 6,         # Number of output channels
           residue_pred      = False,     # Residue pred?
           hidden_channels   = 150,       # GNN Channels #150
           num_filters       = 150,       #              #150
