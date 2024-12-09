@@ -378,7 +378,7 @@ Sample training scripts `train_GSnet.py` and `train_aLCnet.py` are provided for 
 To train a new model:
 
 1. Make sure you have PyTorch datasets generated. See [Generating Datasets](#generating-datasets) for more info.
-2. See the `train_GSnet.py` and `train_aLCnet.py` scripts for examples on how to train our models. Sample data for training both GSnet and aLCnet was provided for selected IDP structures.
+2. See the `train_GSnet.py` and `train_aLCnet.py` scripts for examples on how to train our models. Sample data for training both GSnet and aLCnet was provided for selected structures.
 
 ## More info
 
