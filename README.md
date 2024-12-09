@@ -50,6 +50,8 @@ Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Pr
 - [Pretrained Models](#pretrained-models)
 - [Generating Embeddings](#generating-embeddings)
 - [Generating Datasets](#generating-datasets)
+  - [GSnet Dataset](#gsnet-dataset)
+  - [aLCnet Dataset](#alcnet-dataset)
 - [Training a Model](#training-a-model)
 - [Directory Structure](#directory-structure)
 </details>
@@ -245,9 +247,7 @@ This section describes how to generate embeddings for all PDB files within a spe
 
 The `dataset.py` script allows the creation of datasets for both GSnet and aLCnet via `NumpyRep` and `NumpyRep_atomic` classes, respectively, then via `ProteinDataset` and `AtomicDataset` classes, respectively.
 
-To create a dataset:
-
-#### For GSnet:
+### GSnet Dataset
 
 1. **Have paths to PDBs and target values stored in a CSV file (or similar):**
 
@@ -300,7 +300,7 @@ dataset = ProteinDataset(
 )
 ```
 
-#### For aLCnet:
+### aLCnet Dataset
 
 1. **Have paths to PDBs, residue indicies, and target values stored in a CSV file (or similar):**
 
