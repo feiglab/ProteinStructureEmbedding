@@ -100,7 +100,7 @@ python predict.py /path/to/pdb_file.pdb
 -2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 /path/to/pdb_file.pdb
 ```
 
-### Solvent-Accessible Surface Area (SASA) Prediction
+### SASA Prediction
 
 **Command:**
 
