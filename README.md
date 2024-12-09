@@ -78,7 +78,7 @@ pip install -r requirements.txt
 
 ### Overview
 
-This section explains how to use our models to make predictions on protein properties such as pKa values and other physicochemical properties from protein structures. The steps below include how to run the script with different options to predict specific properties.
+This section explains how to use our models to make predictions of protein properties such as pKa values and other physicochemical properties from protein structures. The steps below include how to run the script with different options to predict specific properties.
 
 ### Steps to Make Predictions
 
