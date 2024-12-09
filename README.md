@@ -196,19 +196,29 @@ This section describes how to generate embeddings for all PDB files within a spe
  Ensure you have followed the installation instructions to set up your environment correctly. This includes having the necessary Python packages installed and the environment activated.
 
 2. **Run the script:**
- Navigate to the `src/` directory in your terminal. Use the following command to generate embeddings:
+ Navigate to the `src/` directory in your terminal. Use the following command(s) to generate embeddings:
+
+#### GSnet embeddings
+
  ```bash
- python embed.py --protein/--residue <path_to_PDB_files> <output_path_for_embeddings>
+ python embed_GSnet.py --protein/--residue <path_to_PDB_files> <output_path_for_embeddings>
  ```
  Replace `<path_to_PDB_files>` with the directory containing your PDB files and `<output_path_for_embeddings>` with the directory where you want to save the embeddings.
 
 - Use the `--protein` option to generate GSnet embeddings optimized for **whole protein predictions** (trained on 6 physicochemical properties).
 - Use the `--residue` option to generate GSnet embeddings optimized for **residue-specific predictions** (fine-tuned on rSASA and pKa).
+- In theory, either embedding method (`--protein` or `--residue`) may be useful in either context. It could be worthwhile to try both embeddings for the same task to determine which is more useful.
+
+#### GSnet embeddings
+
+ ```bash
+ python embed_aLCnet.py <path_to_PDB_files> <output_path_for_embeddings>
+ ```
+ Replace `<path_to_PDB_files>` with the directory containing your PDB files and `<output_path_for_embeddings>` with the directory where you want to save the embeddings.
 
 ### Notes
 
-- The script utilizes multiprocessing to expedite the embedding process. Ensure your system has adequate resources to handle multiple processes simultaneously.
-- In theory, either embedding method (`--protein` or `--residue`) may be useful in either context. It could be worthwhile to try both embeddings for the same task to determine which is more useful.
+- The scripts utilize multiprocessing to expedite the embedding process. Ensure your system has adequate resources to handle multiple processes simultaneously.
 
 ## More info
 
