@@ -23,7 +23,7 @@ import torch
 import pickle
 import os
 import multiprocessing as mp
-from net import Net
+from net import Net_atomic as Net
 from dataset import NumpyRep
 
 def validate_arguments():
@@ -52,29 +52,30 @@ def load_model(device):
     net : Net
         The initialized neural network model.
     """
-    net = Net(embedding_only=True,
-              residue_pred=True,
-              residue_pooling=False,
-              global_mean=True,
-              env_thresh=[6, 8, 10, 12, 15],
-              hidden_channels=150,
-              num_filters=150,
-              num_interactions=6,
-              num_gaussians=300,
-              cutoff=15.0,
-              max_num_neighbors=150,
-              readout='mean',
-              activation='ssp',
-              cc_embedding='rbf',
-              gnn_layer='transformerconv',
-              heads=1,
-              mlp_activation='relu',
-              standardize_cc=True,
-              layernorm=False,
-              advanced_residual=True)
+    # Initialize network
+    net = Net(
+          embedding_only    = True,   # Embedding only
+          fc_opt            = 1,      # Option for GNN -> FC “FCopt{N}”
+          hidden_channels   = 75,     # Number of hidden dimensions -> “{N}channels”
+          num_filters       = 150,    # Number of convolutional filters -> “{N}filters”
+          num_interactions  = 3,      # Number of layers -> “{N}layers”
+          num_gaussians     = 300,    # Number of gaussians for distance expansion
+          sele_cutoff       = 10.0,   # Selection cutoff
+          edge_cutoff       = 5.0,    # Radius graph cutoff -> “{X}edgecutoff”
+          max_num_neighbors = 150,    # Maximum edges per node
+          readout           = 'mean', # Read out the mean
+          out_channels      = 1,      # Number of outcomes (1 for pKa)
+          dropout           = 0.2,    # Dropout rate
+          num_linear        = 6,      # Number of linear layers in FC -> “{N}lin”
+          linear_channels   = 1024,   # Number of hidden linear dims -> “{N}FCch
+          activation        = 'ssp',  # Activation function used in FC layers
+          mlp_activation    = 'relu', # Activation function used in MLP embeddings
+          heads             = 3,      # Number of transformer attention heads “{N}heads”
+          advanced_residual = True,   # Create residual connections?
+          one_hot_res       = False,  # Append one-hot residue encoding to FC?
+         )
 
-    model_dir = '../models'
-    state_dict = '/feig/s1/spencer/gnn/main/models/pka_from_sasa_res.pt'
+    state_dict = '../models/aLCnet_pKa.pt'
     dict1 = torch.load(state_dict, map_location=device)
     todel = [d for d in dict1 if 'fc' in d]
 
