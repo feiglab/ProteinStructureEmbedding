@@ -139,6 +139,7 @@ def create_embedding(pdb, net, device, out_path):
         embedding = net(pos, a, cc, dh)
         #print(embedding.shape)
         torch.save(embedding, f'{out_path}/{name}.pt')
+        print(f'Embedding saved for {name}!')
     except Exception as e:
         print(f'Error loading {pdb}: {e}')
 
@@ -157,7 +158,7 @@ def process_pdbs(pdb_path, out_path, net, device):
     device : torch.device
         The device to run the model on (CPU or GPU).
     """
-    pdbs = [f'{pdb_path}/{f}' for f in os.listdir(pdb_path)]
+    pdbs = [f'{pdb_path}/{f}' for f in os.listdir(pdb_path) if (f.split('.')[-1] == 'pdb')]
     with mp.Pool() as pool:
         pool.starmap(create_embedding, [(pdb, net, device, out_path) for pdb in pdbs])
 

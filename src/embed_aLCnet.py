@@ -22,9 +22,11 @@ import sys
 import torch
 import pickle
 import os
+import subprocess as sub
+import mdtraj as md
 import multiprocessing as mp
 from net import Net_atomic as Net
-from dataset import NumpyRep
+from dataset import NumpyRep_atomic as NumpyRep
 
 def validate_arguments():
     """
@@ -104,18 +106,39 @@ def create_embedding(pdb, net, device, out_path):
     name = pdb.split('/')[-1].strip('.pdb')
 
     try:
-        pdb_rep = NumpyRep(pdb)
+        pqr = '.'.join([frag for frag in pdb.split('.')[:-1] + ['pqr']])
+        if not os.path.isfile(pqr):        
+            sub.run(
+                f'pdb2pqr30 --ff CHARMM {pdb} {pqr}', shell=True,
+                stderr=sub.DEVNULL, stdout=sub.DEVNULL
+            )
 
-        # Convert Numpy data to Torch tensors
-        pos = torch.tensor(pdb_rep.x, dtype=torch.float).to(device)
-        a = torch.tensor(pdb_rep.get_aas(), dtype=torch.long).to(device)
-        cc = torch.tensor(pdb_rep.get_cc(), dtype=torch.float).reshape(-1, 1).to(device)
-        dh = torch.tensor(pdb_rep.get_dh(), dtype=torch.float).to(device)
+        pqr_traj = md.load_pdb(pqr)
 
-        # Get embedding and save
-        embedding = net(pos, a, cc, dh)
-        print(embedding.shape)
-        torch.save(embedding, f'{out_path}/{name}.pt')
+        protein_embedding = []
+
+        for r in pqr_traj.top.residues:
+            resSeq = r.resSeq
+
+            pdb_rep = NumpyRep(pqr,resSeq,traj=pqr_traj)
+
+            # Convert Numpy data to Torch tensors
+            pos = torch.tensor(pdb_rep.x, dtype=torch.float).to(device)
+            a = torch.tensor(pdb_rep.a, dtype=torch.long).to(device)
+            atoms = torch.tensor(pdb_rep.atoms, dtype=torch.long).to(device)
+            charge = torch.tensor(pdb_rep.charge, dtype=torch.float).to(device)
+            resid_ca=torch.tensor(pdb_rep.resid_ca).to(device)
+            resid_atomic=torch.tensor(pdb_rep.resid_atomic).to(device)
+
+            # Get embedding and save
+            embedding = net(pos, a, atoms, charge,
+                            resid_ca=resid_ca, resid_atomic=resid_atomic)
+
+            protein_embedding.append(embedding[0])
+
+        #print(embedding.shape)
+        torch.save(torch.stack(protein_embedding), f'{out_path}/{name}.pt')
+        print(f'Embedding saved for {name}!')
     except Exception as e:
         print(f'Error loading {pdb}: {e}')
 
@@ -134,7 +157,7 @@ def process_pdbs(pdb_path, out_path, net, device):
     device : torch.device
         The device to run the model on (CPU or GPU).
     """
-    pdbs = [f'{pdb_path}/{f}' for f in os.listdir(pdb_path)]
+    pdbs = [f'{pdb_path}/{f}' for f in os.listdir(pdb_path) if f.split('.')[-1] == 'pdb']
     with mp.Pool() as pool:
         pool.starmap(create_embedding, [(pdb, net, device, out_path) for pdb in pdbs])
 
