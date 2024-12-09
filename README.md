@@ -136,15 +136,13 @@ python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
 
 ### Notes
 
-- The script is capable of handling multiple input files and can process them in batches if specified.
-- For detailed error messages and troubleshooting, the script outputs logs that can be checked in case of failures.
+- The script is capable of handling multiple input files if you provide them as arguments.
 - Remember to use the cleaning options if your PDB files might contain non-standard residues or formats.
 
 For a full description of the utility of the `predict.py` script, you can run `python predict.py -h` or `python predict.py --help`:
 
 ```
-usage: predict.py [-h] [--clean] [--pka] [--atomic] [--sasa] [--shift] [--chain chain] [--combine-chains] [--keep] [--cpu] [--gpu] [--numpy] [--time]
-                  [--skip-bad-files]
+usage: predict.py [-h] [--clean] [--pka] [--atomic] [--sasa] [--shift] [--chain chain] [--combine-chains] [--keep] [--cpu] [--gpu] [--numpy] [--time] [--skip-bad-files]
                   pdbs [pdbs ...]
 
 ML prediction on PDB files
