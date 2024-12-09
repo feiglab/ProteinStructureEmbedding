@@ -345,11 +345,11 @@ Sample training scripts `train_GSnet.py` and `train_aLCnet.py` are provided for 
 To train a new model:
 
 1. Make sure you have PyTorch datasets generated. See [Generating Datasets](#generating-datasets) for more info.
-2. See 
+2. See the `train_GSnet.py` and `train_aLCnet.py` scripts for examples on how to train our models.
 
 ## More info
 
-For more info, please email me at **spencerwozniak1@gmail.com**
+For more info, or if you have any questions, please email me at **spencerwozniak1@gmail.com**
 
 ## Directory Structure
 
