@@ -356,7 +356,7 @@ For more info, or if you have any questions, please email me at **spencerwozniak
 Here’s a brief overview of the directory structure:
 
 ```
-hydropro_ml/
+ProteinStructureEmbedding/
 │
 ├── pKa-datasets/       # Our datasets for pKa training.
 |   |
