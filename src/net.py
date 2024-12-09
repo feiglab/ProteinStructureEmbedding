@@ -903,7 +903,7 @@ def map_a_tensor(input_tensor):
 def radius(x, y, r, batch_x=None, batch_y=None, max_num_neighbors=32, batch_size=None):
     """
     Custom 'radius' implementation to find neighbor pairs within a specified radius.
-    (Needed to prevent)
+    (Needed to prevent Pytorch bugs between CPU and GPU)
 
     Parameters
     ----------
@@ -963,6 +963,7 @@ def radius(x, y, r, batch_x=None, batch_y=None, max_num_neighbors=32, batch_size
 def radius_graph(x, r, batch=None, loop=False, max_num_neighbors=32, flow='source_to_target', batch_size=None):
     """
     Custom 'radius_graph' implementation to construct a graph where edges connect nodes within a specified radius.
+    (Needed to prevent pytorch bugs between GPU and CPU)
 
     Parameters
     ----------
