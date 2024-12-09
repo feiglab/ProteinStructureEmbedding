@@ -44,6 +44,9 @@ Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Pr
 
 - [Installation](#installation)
 - [Making Predictions](#making-predictions)
+  - [Default Physicochemical Properties Prediction](#Default-Physicochemical-Properties-Prediction)
+  - [SASA Prediction](#Solvent-Accessible-Surface-Area-(SASA)-Prediction)
+  - [pKa Prediction](#pKa-value-prediction)
 - [Pretrained Models](#pretrained-models)
 - [Generating Embeddings](#generating-embeddings)
 - [Generating Datasets](#generating-datasets)
@@ -82,7 +85,7 @@ pip install -r requirements.txt
 
 The `predict.py` script provided allows prediction of all physicochemical properties discussed above.
 
-<details><summary><b>Default Physicochemical Properties Prediction</b></summary>
+### Default Physicochemical Properties Prediction
 
 **Command:**
 
@@ -97,9 +100,7 @@ python predict.py /path/to/pdb_file.pdb
 -2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 /path/to/pdb_file.pdb
 ```
 
-</details>
-
-<details><summary><b>Solvent-Accessible Surface Area (SASA) Prediction</b></summary>
+### Solvent-Accessible Surface Area (SASA) Prediction
 
 **Command:**
 
@@ -114,9 +115,7 @@ python predict.py --sasa /path/to/pdb_file.pdb
 -2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 2.3868515E+02 /path/to/pdb_file.pdb
 ```
 
-</details>
-
-<details><summary><b>pKa value prediction</b></summary>
+### pKa value prediction
 
 Note that pKa predictions are faster and more accurate with `aLCnet`. To use `aLCnet`, you must use the option `--atomic`.
 
@@ -134,9 +133,8 @@ python predict.py --pka --atomic /path/to/pdb_file.pdb
 3.903559068776328 ASP 11 A /path/to/pdb_file.pdb
 ...
 ```
-</details>
 
-<details><summary><b>pKa shift prediction</b></summary>
+### pKa shift prediction
 
 Note that pKa predictions are faster and more accurate with `aLCnet`. To use `aLCnet`, you must use the option `--atomic`.
 
@@ -155,8 +153,6 @@ python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
 0.003559068776328278 ASP 11 A /path/to/pdb_file.pdb
 ...
 ```
-
-</details>
 
 
 ### Notes
