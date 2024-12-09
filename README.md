@@ -225,11 +225,74 @@ This section describes how to generate embeddings for all PDB files within a spe
 
 ## Generating Datasets
 
-The `dataset.py` script allows the creation of datasets for both GSnet and aLCnet via `NumpyRep` and `NumpyRep_atomic`, respectively, then via `ProteinDataset` and `AtomicDataset` classes, respectively.
+The `dataset.py` script allows the creation of datasets for both GSnet and aLCnet via `NumpyRep` and `NumpyRep_atomic` classes, respectively, then via `ProteinDataset` and `AtomicDataset` classes, respectively.
 
 To create a dataset:
 
-1.
+1. Generate NumPy representations of the data.
+
+#### For GSnet:
+
+Imagine you have a CSV file like this:
+
+```csv
+PDB,Target Value
+/path/to/file1.pdb, 4.10
+/path/to/file2.pdb, 6.21
+/path/to/file3.pdb, 7.94
+...
+```
+
+You should write a script like this to get NPZ files for each datapoint (row)
+
+```python
+import numpy as np
+import pandas as pd
+from dataset import NumpyRep
+
+outdir = '/path/to/output/dir'
+
+df = pd.read_csv('/path/to/file.csv') # Read CSV file
+
+# Iterate over datapoints in dataset (this can be expidited with multiprocessing)
+for i, row in df.iterrows(): 
+    rep = NumpyRep(row[0]) # Create a NumpyRep for PDB
+    y = float(row[1])      # Extract target value
+    np.savez(
+        f'{outdir}/{i}.npz', # Define output file path
+        p = i,               # Define index
+        label = y,           # Define target value
+        x = rep.x,           # Define Cartesian coordinates of residues
+        a = rep.get_aas(),   # Define residue types
+        dh = rep.get_dh(),   # Define dihedral information
+        cc = rep.get_cc()    # Define alpha carbon to center of mass distance
+    )
+```
+
+You can then generate a PyTorch dataset like this:
+
+```python
+import numpy as np
+from dataset import ProteinDataset
+
+dataset = ProteinDataset(
+    root='/path/to/output/dir', # Path to directory containing NPZ files
+    use_dh=True,                # Specify that dihedral info is used
+    use_cc=True,                # Specify that ca-cofm distance is used
+    normalize=True              # Normalize target values
+)
+```
+
+For aLCnet:
+
+```python
+import numpy as np
+from dataset import NumpyRep_atomic
+
+
+```
+
+2. 
 
 ## Training a Model
 
