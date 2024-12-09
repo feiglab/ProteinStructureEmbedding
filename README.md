@@ -142,7 +142,9 @@ python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
 For a full description of the utility of the `predict.py` script, you can run `python predict.py -h` or `python predict.py --help`:
 
 ```
-usage: predict.py [-h] [--clean] [--pka] [--atomic] [--sasa] [--shift] [--chain chain] [--combine-chains] [--keep] [--cpu] [--gpu] [--numpy] [--time] [--skip-bad-files]
+usage: predict.py [-h] [--clean] [--pka] [--atomic] [--sasa] [--shift]
+                  [--chain chain] [--combine-chains] [--keep]
+                  [--cpu] [--gpu] [--numpy] [--time] [--skip-bad-files]
                   pdbs [pdbs ...]
 
 ML prediction on PDB files
