@@ -204,19 +204,16 @@ optional arguments:
 
 ## Generating Embeddings
 
-This section describes how to generate embeddings for all PDB files within a specified directory.
+The `embed_GSnet.py` and `embed_aLCnet.py` scripts allow you to easily generate embeddings for all PDB files within a specified directory.
 
 - Generated embeddings (via either method) will be saved as tensors of shape `[N,d]` where `N` is the number of residues in the protein and `d` is the embedding dimension.
 
 ### Steps to Generate Embeddings
 
-1. **Prepare your environment:**
- Ensure you have followed the installation instructions to set up your environment correctly. This includes having the necessary Python packages installed and the environment activated.
-
-2. **Gather PDB files**
+1. **Gather PDB files**
  Put PDB files containing only 1 chain that you would like embeddings for into a directory. Make sure the file extension for the files is `.pdb`.
  
-3. **Run the script:**
+2. **Run the script:**
  Navigate to the `src/` directory in your terminal. Use the following command(s) to generate embeddings:
 
 #### GSnet embeddings
