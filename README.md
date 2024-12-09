@@ -45,7 +45,7 @@ Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Pr
 - [Installation](#installation)
 - [Making Predictions](#making-predictions)
   - [Default Physicochemical Properties Prediction](#Default-Physicochemical-Properties-Prediction)
-  - [SASA Prediction](#Solvent-Accessible-Surface-Area-(SASA)-Prediction)
+  - [SASA Prediction](#SASA-Prediction)
   - [pKa Prediction](#pKa-value-prediction)
 - [Pretrained Models](#pretrained-models)
 - [Generating Embeddings](#generating-embeddings)
