@@ -8,39 +8,15 @@
 #  for predicting pKa values.
 #
 
-## Imports
+# Imports
 import os
 import sys
-import pickle
-import os.path as osp
-import warnings
-from math import pi as PI
-from typing import Optional
-import time
-from tqdm import tqdm
-import matplotlib
-import matplotlib.pyplot as plt
-import mdtraj as md
-import random
-from scipy.stats import pearsonr
-from time import strftime, localtime
-import subprocess as sub
-
-## Torch
-import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.nn import Embedding, Linear, ModuleList, Sequential
-from torch_scatter import scatter
-
-## Torch Geometric
+from torch_geometric.data import Dataset
 import torch_geometric
-from torch_geometric.data import Dataset, download_url, extract_zip
-from torch_geometric.data.makedirs import makedirs
-from torch_geometric.nn import MessagePassing, radius_graph
 
-# 
+# Project-Specific Modules 
 from dataset import AtomicDataset
 from net import Net_atomic as Net
 
