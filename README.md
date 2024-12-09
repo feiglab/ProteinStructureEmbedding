@@ -66,8 +66,6 @@ conda activate gsnet
 pip install -r requirements.txt
 ```
 
-
-
 ## Making Predictions
 
 ### Overview
@@ -145,8 +143,6 @@ python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
 - For detailed error messages and troubleshooting, the script outputs logs that can be checked in case of failures.
 - Remember to use the cleaning options if your PDB files might contain non-standard residues or formats.
 
-These methods allow for the flexible application of our models to a variety of prediction tasks in protein analysis.
-
 For a full description of the utility of the `predict.py` script, you can run `python predict.py -h` or `python predict.py --help`:
 
 ```
@@ -190,7 +186,7 @@ optional arguments:
 
 ### Overview
 
-This section describes how to generate embeddings for all PDB files within a specified directory. Embeddings are crucial for downstream prediction tasks and are saved for subsequent use.
+This section describes how to generate embeddings for all PDB files within a specified directory. Embeddings are crucial for downstream prediction tasks and can be saved for subsequent use.
 
 ### Steps to Generate Embeddings
 
@@ -204,30 +200,13 @@ This section describes how to generate embeddings for all PDB files within a spe
  ```
  Replace `<path_to_PDB_files>` with the directory containing your PDB files and `<output_path_for_embeddings>` with the directory where you want to save the embeddings.
 
-- Using the `--protein` option uses the GSnet optimized for whole protein predictions.
-- Using the `--residue` option uses the GSnet optimized for ressidue-specific predictions.
-
-### Example Command
-
-```bash
-python embed.py --protein /path/to/pdb /path/to/output
-```
-
-This command processes all PDB files, with the GSnet optimized for whole protein predictions, in `/path/to/pdb` and saves the resulting embeddings in `/path/to/output`. 
-
-### Troubleshooting
-
-- Ensure that the paths provided are correct and accessible.
-- Verify that the pre-trained model file is in the correct directory and properly named.
-- Check your Python environment if you encounter dependencies errors.
-- If the script fails with a CUDA error and you are running on a GPU, ensure that your device has sufficient memory and is compatible.
+- Use the `--protein` option to generate GSnet embeddings optimized for **whole protein predictions** (trained on 6 physicochemical properties).
+- Use the `--residue` option to generate GSnet embeddings optimized for **residue-specific predictions** (fine-tuned on rSASA and pKa).
 
 ### Notes
 
 - The script utilizes multiprocessing to expedite the embedding process. Ensure your system has adequate resources to handle multiple processes simultaneously.
-- The embedding process can be sensitive to the structure and quality of the input PDB files. The scripts will automatically attempt to clean and process broken PDB files, but it may not always work. Please ensure that the files you use are correctly formatted and contain all necessary information.
-
-This method of generating embeddings is integral to leveraging the predictive power of our GNN models for analyzing protein structures.
+- In theory, either embedding method (`--protein` or `--residue`) may be useful in either context. It could be worthwhile to try both embeddings for the same task to determine which is more useful.
 
 ## More info
 
