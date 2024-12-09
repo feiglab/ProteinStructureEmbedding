@@ -169,9 +169,9 @@ for i in range(1001):
         best_loss = loss_v
 
     # Write results
-    sys.stderr.write(f'Epoch: {str(i).rjust(3)} | Training Loss: {str(round(loss,6)).rjust(10)} | Validation Loss: {str(round(loss_v,6)).rjust(10)}')
+    sys.stderr.write(f'Epoch: {str(i).rjust(3)} | Training Loss: {str(round(loss,6)).rjust(10)} | Validation Loss: {str(round(loss_v,6)).rjust(10)}\n')
     
     # Terminate training if 10 consequtive epochs pass without improvement in validation performance
     if (i - best_epoch) > 10:
-        sys.stderr.write('Training complete.')
+        sys.stderr.write('Training complete.\n')
         break
