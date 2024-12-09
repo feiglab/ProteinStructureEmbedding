@@ -22,7 +22,7 @@ Properties that these models can predict include:
 ![aLCnet architecture dark](https://github.com/user-attachments/assets/e09d162d-1bc2-4047-84cb-8017b026554c)
 
 
-### Paper
+<details><summary>Paper</summary>
 
 You can access the pre-print at the following link:
 
@@ -31,8 +31,10 @@ You can access the pre-print at the following link:
 To cite our pre-print in your work, use:
 
 Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning. *Preprint available on arXiv*. https://arxiv.org/
+</details>
 
-## Table of Contents
+
+<details open><summary>Table of Contents</summary>
 
 - [Installation](#installation)
 - [Making Predictions](#making-predictions)
@@ -41,6 +43,7 @@ Wozniak, S., Janson, G., & Feig, M. (2024). Accurate Predictions of Molecular Pr
 - [Generating Datasets](#generating-datasets)
 - [Training a Model](#training-a-model)
 - [Directory Structure](#directory-structure)
+</details>
 
 ## Installation
 
