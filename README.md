@@ -209,12 +209,14 @@ This section describes how to generate embeddings for all PDB files within a spe
 - Use the `--residue` option to generate GSnet embeddings optimized for **residue-specific predictions** (fine-tuned on rSASA and pKa).
 - In theory, either embedding method (`--protein` or `--residue`) may be useful in either context. It could be worthwhile to try both embeddings for the same task to determine which is more useful.
 
-#### GSnet embeddings
+#### aLCnet embeddings
 
  ```bash
  python embed_aLCnet.py <path_to_PDB_files> <output_path_for_embeddings>
  ```
  Replace `<path_to_PDB_files>` with the directory containing your PDB files and `<output_path_for_embeddings>` with the directory where you want to save the embeddings.
+
+- This will take longer than GSnet embeddings because separate graphs will be constructed for atoms around each residue, rather than for the whole protein.
 
 ### Notes
 
