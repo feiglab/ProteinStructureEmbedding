@@ -203,27 +203,10 @@ This section describes how to generate embeddings for all PDB files within a spe
 - Use the `--protein` option to generate GSnet embeddings optimized for **whole protein predictions** (trained on 6 physicochemical properties).
 - Use the `--residue` option to generate GSnet embeddings optimized for **residue-specific predictions** (fine-tuned on rSASA and pKa).
 
-### Examples
-
-If I am attempting to use GSnet embeddings for making protein-level pI predictions, I would run:
-
-```bash
-python embed.py --protein /path/to/pdb /path/to/output
-```
-
-- This command processes all PDB files, with the GSnet optimized for whole protein predictions, in `/path/to/pdb` and saves the resulting embeddings in `/path/to/output`. 
-
-If I am attempting to use GSnet embeddings to predict whether a residue is involved in the active site of an enzyme, I would run:
-
-```bash
-python embed.py --residue /path/to/pdb /path/to/output
-```
-
-- This command processes all PDB files, with the GSnet optimized for residue-level predictions, in `/path/to/pdb` and saves the resulting embeddings in `/path/to/output`. 
-
 ### Notes
 
 - The script utilizes multiprocessing to expedite the embedding process. Ensure your system has adequate resources to handle multiple processes simultaneously.
+- In theory, either embedding method (`--protein` or `--residue`) may be useful in either context. It could be worthwhile to try both embeddings for the same task to determine which is more useful.
 
 ## More info
 
