@@ -90,7 +90,7 @@ This section explains how to use our models to make predictions of protein prope
 
 2. **Run the prediction script:**
 
-#### Default Physicochemical Properties Prediction
+<details><b>Default Physicochemical Properties Prediction</b>
 - **Command:**
 ```bash
 python predict.py /path/to/pdb_file.pdb
@@ -100,8 +100,9 @@ python predict.py /path/to/pdb_file.pdb
 ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
 -2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 /path/to/pdb_file.pdb
 ```
+</details>
 
-#### Solvent-Accessible Surface Area (SASA) Prediction
+<details><b>Solvent-Accessible Surface Area (SASA) Prediction</b>
 - **Command:**
 ```bash
 python predict.py --sasa /path/to/pdb_file.pdb
@@ -111,8 +112,8 @@ python predict.py --sasa /path/to/pdb_file.pdb
 ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE
 -2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 2.3868515E+02 /path/to/pdb_file.pdb
 ```
-
-#### pKa Prediction
+</details>
+<details><b>pKa Prediction</b>
 **pKa value prediction:**
 - **Command:**
 ```bash
@@ -147,6 +148,7 @@ python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
 0.003559068776328278 ASP 11 A /path/to/pdb_file.pdb
 ...
 ```
+</details>
 
 ### Notes
 
