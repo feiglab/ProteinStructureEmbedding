@@ -1,0 +1,3 @@
+50,Mitochondrial import receptor subunit TOM5,https://alphafold.ebi.ac.uk/entry/P80967
+200,Cysteine dioxygenase type 1,https://alphafold.ebi.ac.uk/entry/Q16878
+500,4-aminobutyrate aminotransferase (mitochondrial),https://alphafold.ebi.ac.uk/entry/P80404
