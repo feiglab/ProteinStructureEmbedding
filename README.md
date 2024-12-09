@@ -358,7 +358,7 @@ Here’s a brief overview of the directory structure:
 ```
 hydropro_ml/
 │
-├── datasets/           # Our datasets for pKa training.
+├── pKa-datasets/       # Our datasets for pKa training.
 |   |
 |   ├── MSU-pKa-train.csv   # Our training dataset.
 |   ├── MSU-pKa-val.csv     # Our validation dataset.
