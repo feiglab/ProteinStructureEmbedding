@@ -72,8 +72,8 @@ This section explains how to use our models to make predictions on protein prope
 
 ### Steps to Make Predictions
 
-1. **Prepare your environment:**
- Ensure your environment is properly set up as described in the [installation section](#installation), and you have the necessary [pre-trained models](#pretrained-models) downloaded.
+1. **Prepare your environment**
+  Ensure your environment is properly set up as described in the [installation section](#installation), and you have the necessary [pre-trained models](#pretrained-models) downloaded.
 
 2. **Run the prediction script:**
 
