@@ -192,7 +192,7 @@ optional arguments:
 | `GSnet_default.pt`    | 5,971,748       | The original GSnet model trained on the 6 physicochemical properties. |
 | `GSnet_SASA.pt`       | 5,971,748       | GSnet fine-tuned for molecular SASA predictions.                  |
 | `GSnet_pKa.pt`        | 11,210,392       | GSnet fine-tuned for residue-level SASA, then further trained to predict pKa values.              |
-| `aGSnet_pKa.pt`       | 4,784,324       | aGSnet trained from scratch on PHMD549 data and fine-tuned for pKa prediction on experimental data. |
+| `aLCnet_pKa.pt`       | 4,784,324       | aLCnet trained from scratch on PHMD549 data and fine-tuned for pKa prediction on experimental data. |
 
 
 ## Generating Embeddings
@@ -267,7 +267,7 @@ hydropro_ml/
 |   ├── GSnet_default.pt    # Original pretrained GSnet.
 |   ├── GSnet_SASA.pt       # GSnet fine-tuned for SASA predictions.
 |   ├── GSnet_pKa.pt        # GSnet fine-tuned for pKa predictions.
-|   ├── aGSnet_pka.pt       # aGSnet trained for pKa predictions.
+|   ├── aLCnet_pka.pt       # aLCnet trained for pKa predictions.
 |   └── normalization.npz   # Normalization parameters.
 |
 ├── requirements.txt    # Required Python packages to run our model.
