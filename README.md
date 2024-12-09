@@ -90,7 +90,7 @@ This section explains how to use our models to make predictions of protein prope
 
 2. **Run the prediction script:**
 
-<details><b>Default Physicochemical Properties Prediction</b>
+<details><summary><b>Default Physicochemical Properties Prediction</b></summary>
 - **Command:**
 ```bash
 python predict.py /path/to/pdb_file.pdb
@@ -102,7 +102,7 @@ python predict.py /path/to/pdb_file.pdb
 ```
 </details>
 
-<details><b>Solvent-Accessible Surface Area (SASA) Prediction</b>
+<details><summary><b>Solvent-Accessible Surface Area (SASA) Prediction</b></summary>
 - **Command:**
 ```bash
 python predict.py --sasa /path/to/pdb_file.pdb
@@ -113,7 +113,7 @@ python predict.py --sasa /path/to/pdb_file.pdb
 -2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 2.3868515E+02 /path/to/pdb_file.pdb
 ```
 </details>
-<details><b>pKa Prediction</b>
+<details><summary><b>pKa Prediction</b></summary>
 **pKa value prediction:**
 - **Command:**
 ```bash
