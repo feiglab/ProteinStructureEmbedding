@@ -228,8 +228,6 @@ The `dataset.py` script allows the creation of datasets for both GSnet and aLCne
 
 To create a dataset:
 
-
-
 #### For GSnet:
 
 1. **Have paths to PDBs and target values stored in a CSV file (or similar):**
@@ -336,13 +334,18 @@ dataset = AtomicDataset(
 )
 ```
 
+### Notes
+
+- You can split the NPZ data into multiple directories to have training, validation, test sets via any method you choose. You can then load multiple PyTorch datasets.
+
 ## Training a Model
 
 Sample training scripts `train_GSnet.py` and `train_aLCnet.py` are provided for training GSnet and aLCnet, respectively.
 
 To train a new model:
 
-1. 
+1. Make sure you have PyTorch datasets generated. See [Generating Datasets](#generating-datasets) for more info.
+2. See 
 
 ## More info
 
