@@ -210,7 +210,7 @@ The `embed_GSnet.py` and `embed_aLCnet.py` scripts allow you to easily generate 
 
 ### Steps to Generate Embeddings
 
-1. **Gather PDB files**
+1. **Gather PDB files:**
  Put PDB files containing only 1 chain that you would like embeddings for into a directory. Make sure the file extension for the files is `.pdb`.
  
 2. **Run the script:**
