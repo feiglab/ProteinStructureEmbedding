@@ -3,15 +3,14 @@
 #
 # Script for making predictions
 #
-#
 # ------------------------------------------------------------------------------
 # Citation Information
 # ------------------------------------------------------------------------------
 # Authors: Spencer Wozniak, Giacomo Janson, Michael Feig
 # Emails: spencerwozniak1@gmail.com, mfeiglab@gmail.com
 # Paper Title: "Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning"
-# DOI: https://doi.org/xxxxxxxx
-# GitHub: https://github.com/feiglab/hydropro_ml
+# DOI: https://doi.org/10.1101/2024.12.10.627714
+# GitHub: https://github.com/feiglab/ProteinStructureEmbedding
 #
 # Please cite the above paper if you use this code in your research.
 # ------------------------------------------------------------------------------
