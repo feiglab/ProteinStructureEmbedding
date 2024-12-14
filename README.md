@@ -32,7 +32,7 @@ Properties that these models can predict include:
 
 For more information about this project, you can access the pre-print at the following link:
 
-[Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning]([https://arxiv.org/](https://www.biorxiv.org/content/10.1101/2024.12.10.627714v1.full.pdf+html))
+![Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning]([https://arxiv.org/](https://www.biorxiv.org/content/10.1101/2024.12.10.627714v1.full.pdf+html))
 
 To cite our project in your work, use:
 
@@ -44,7 +44,6 @@ To cite our project in your work, use:
 	year = {2024},
 	doi = {10.1101/2024.12.10.627714},
 	publisher = {Cold Spring Harbor Laboratory},
-	abstract = {Machine learning has emerged as a promising approach for predicting molecular properties of proteins, as it addresses limitations of experimental and traditional computational methods. Here, we introduce GSnet, a graph neural network (GNN) trained to predict physicochemical and geometric properties including solvation free energies, diffusion constants, and hydrodynamic radii, based on three-dimensional protein structures. By leveraging transfer learning, pre-trained GSnet embeddings were adapted to predict solvent-accessible surface area (SASA) and residue-specific pKa values, achieving high accuracy and generalizability. Notably, GSnet outperformed existing protein embeddings for SASA prediction, and a locally charge-aware variant, aLCnet, approached the accuracy of simulation-based and empirical methods for pKa prediction. Our GNN framework demonstrated robustness across diverse datasets, including intrinsically disordered peptides, and scalability for high-throughput applications. These results highlight the potential of GNN-based embeddings and transfer learning to advance protein structure analysis, providing a foundation for integrating predictive models into proteome-wide studies and structural biology pipelines.Competing Interest StatementThe authors have declared no competing interest.},
 	URL = {https://www.biorxiv.org/content/early/2024/12/12/2024.12.10.627714},
 	eprint = {https://www.biorxiv.org/content/early/2024/12/12/2024.12.10.627714.full.pdf},
 	journal = {bioRxiv}
