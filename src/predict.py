@@ -219,7 +219,9 @@ def load_models(args, device):
                               advanced_residual = True,   # Create residual connections?
                               one_hot_res       = False,  # Append one-hot residue encoding to FC?
                             )
+            #state_dict = torch.load(f'{model_dir}/aLCnet_pKa.pt', map_location=device)
             state_dict = torch.load(f'{model_dir}/aLCnet_pKa.pt', map_location=device)
+
             models['gnn'].load_state_dict(state_dict, strict=False)
     elif args.sasa:
         models['gnn'] = Net(embedding_only=True)
@@ -474,7 +476,7 @@ def predict(rep, models, avg, std, args, device):
                         t0 = perf_counter()
                     
                     sub.run(
-                        f'pdb2pqr30 --ff CHARMM {rep.pdb} {pqr}', shell=True,
+                        f'pdb2pqr30 --ff AMBER {rep.pdb} {pqr}', shell=True,
                         stderr=sub.DEVNULL, stdout=sub.DEVNULL
                     )
 
