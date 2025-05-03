@@ -37,16 +37,19 @@ For more information about this project, you can access the pre-print at the fol
 To cite our project in your work, use:
 
 ```bibtex
-@article {Wozniak2024.12.10.627714,
-	author = {Wozniak, Spencer and Janson, Giacomo and Feig, Michael},
-	title = {Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning},
-	elocation-id = {2024.12.10.627714},
-	year = {2024},
-	doi = {10.1101/2024.12.10.627714},
-	publisher = {Cold Spring Harbor Laboratory},
-	URL = {https://www.biorxiv.org/content/early/2024/12/12/2024.12.10.627714},
-	eprint = {https://www.biorxiv.org/content/early/2024/12/12/2024.12.10.627714.full.pdf},
-	journal = {bioRxiv}
+@article{
+doi:10.1021/acs.jctc.4c01682,
+author = {Wozniak, Spencer and Janson, Giacomo and Feig, Michael},
+title = {Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning},
+journal = {Journal of Chemical Theory and Computation},
+volume = {0},
+number = {0},
+pages = {null},
+year = {0},
+doi = {10.1021/acs.jctc.4c01682},
+note ={PMID: 40270304},
+URL = {https://doi.org/10.1021/acs.jctc.4c01682},
+eprint = {https://doi.org/10.1021/acs.jctc.4c01682}
 }
 ```
 
