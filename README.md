@@ -37,17 +37,16 @@ For more information about this project, you can access the paper at the followi
 To cite our project in your work, use:
 
 ```bibtex
-@article{
-doi:10.1021/acs.jctc.4c01682,
+@article{doi:10.1021/acs.jctc.4c01682,
 author = {Wozniak, Spencer and Janson, Giacomo and Feig, Michael},
 title = {Accurate Predictions of Molecular Properties of Proteins via Graph Neural Networks and Transfer Learning},
 journal = {Journal of Chemical Theory and Computation},
-volume = {0},
-number = {0},
-pages = {null},
-year = {0},
+volume = {21},
+number = {9},
+pages = {4830-4845},
+year = {2025},
 doi = {10.1021/acs.jctc.4c01682},
-note ={PMID: 40270304},
+note = {PMID: 40270304},
 URL = {https://doi.org/10.1021/acs.jctc.4c01682},
 eprint = {https://doi.org/10.1021/acs.jctc.4c01682}
 }
