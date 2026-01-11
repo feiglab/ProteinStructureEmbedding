@@ -380,7 +380,7 @@ To train a new model:
 
 ## More info
 
-For more info, or if you have any questions, please email me at **spencerwozniak1@gmail.com**
+For more info, or if you have any questions, please email me at **hey@spencerwozniak.com**
 
 ## Directory Structure
 
