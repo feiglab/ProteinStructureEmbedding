@@ -257,7 +257,54 @@ The `embed_GSnet.py` and `embed_aLCnet.py` scripts allow you to easily generate 
 
 ## Generating Datasets
 
-The `dataset.py` script allows the creation of datasets for both GSnet and aLCnet via `NumpyRep` and `NumpyRep_atomic` classes, respectively, then via `ProteinDataset` and `AtomicDataset` classes, respectively.
+Datasets for GSnet and aLCnet can be created in two ways: (1) using the **`generate_datasets.py`** script from residue-level CSV files (recommended when you have PDB IDs and pKa or other residue-level targets), or (2) manually with the **`dataset.py`** classes `NumpyRep` / `NumpyRep_atomic` and then `ProteinDataset` / `AtomicDataset`. The script automates downloading, chain extraction, and NPZ generation; the manual approach is for custom pipelines or when your data is already in a different format.
+
+### Using the generate_datasets.py script
+
+The `src/generate_datasets.py` script builds GSnet and/or aLCnet datasets from residue-level CSV files. It downloads PDBs from the RCSB if missing, extracts a single chain, writes cleaned single-chain PDBs to disk, and generates NPZ files (and output CSVs) in the format expected by `ProteinDataset` and `AtomicDataset`.
+
+**Input CSV format**
+
+Each input CSV must have the following columns:
+
+| Column   | Description                                      |
+|----------|--------------------------------------------------|
+| `PDB`    | PDB ID (e.g. `1abc`) or path to a local PDB file |
+| `CHAIN`  | Chain ID to use (e.g. `A`)                       |
+| `RES`    | Residue name (informational)                     |
+| `RES_IDX`| Residue index (1-based) for the target residue   |
+| `PKA`    | Target value (e.g. pKa) for that residue         |
+
+**How the script works**
+
+1. For each row in the CSV, the script resolves the PDB file: if `PDB` looks like a PDB ID (e.g. `1abc`), it downloads the file from the RCSB into the output tree if not already present; otherwise it uses the given path.
+2. It extracts the requested chain and keeps only standard amino acids (same filtering as the prediction script), writing a cleaned single-chain PDB (e.g. `{PDB}_{CHAIN}.pdb`) into the output directory.
+3. Using the cleaned PDB and the row’s `RES_IDX` and `PKA`, it builds the appropriate representations and saves NPZ files for GSnet and/or aLCnet (depending on `--dataset`).
+4. It writes summary CSVs (`csv/gsnet.csv` and/or `csv/alcnet.csv`) that list the final PDB paths and target values, matching the layout expected by the manual workflow below.
+
+**Command**
+
+From the project root (or with `src` on `PYTHONPATH`):
+
+```bash
+python src/generate_datasets.py --input_csv /path/to/file1.csv [/path/to/file2.csv ...] --outdir /path/to/output [--dataset gsnet|alcnet|both]
+```
+
+- **`--input_csv`**: One or more input CSV files (residue-level, format above).
+- **`--outdir`**: Root directory under which all outputs are written.
+- **`--dataset`**: `gsnet`, `alcnet`, or `both` (default: `both`). Controls whether to generate GSnet NPZs, aLCnet NPZs, or both.
+
+**Output layout**
+
+For each input CSV file, the script creates a subdirectory under `--outdir` named after the CSV (without the `.csv` extension). Inside that subdirectory:
+
+| Path       | Contents                                                                 |
+|------------|--------------------------------------------------------------------------|
+| `pdbs/`    | Downloaded and/or chain-extracted PDBs (e.g. `1abc.pdb`, `1abc_A.pdb`).  |
+| `npz/`     | NPZ files: `gsnet_0.npz`, `gsnet_1.npz`, ... and/or `alcnet_0.npz`, `alcnet_1.npz`, ... (one per CSV row). |
+| `csv/`     | Summary CSVs: `gsnet.csv` (columns `PDB`, `Target`) and/or `alcnet.csv` (columns `PDB`, `Res`, `Target`). |
+
+The NPZ files have the same structure as in the manual workflow below. You can load them with `ProteinDataset` (for `npz/gsnet_*.npz`) or `AtomicDataset` (for `npz/alcnet_*.npz`) by passing the `npz` directory as `root` (e.g. `root='/path/to/output/my_dataset/npz'` for a dataset named `my_dataset`). Splitting into train/val/test is done by organizing or symlinking NPZ directories and then creating separate `ProteinDataset` / `AtomicDataset` instances for each split.
 
 ### GSnet Dataset
 
@@ -283,7 +330,7 @@ outdir = '/path/to/output/dir'
 df = pd.read_csv('/path/to/file.csv') # Read CSV file
 
 # Iterate over datapoints in dataset (this can be expidited with multiprocessing)
-for i, row in df.iterrows(): 
+for i, row in df.iterrows():
     rep = NumpyRep(row[0]) # Create a NumpyRep for PDB
     y = float(row[1])      # Extract target value
 
@@ -336,7 +383,7 @@ outdir = '/path/to/output/dir'
 df = pd.read_csv('/path/to/file.csv') # Read CSV file
 
 # Iterate over datapoints in dataset (this can be expidited with multiprocessing)
-for i, row in df.iterrows(): 
+for i, row in df.iterrows():
     rep = NumpyRep_atomic(row[0],row[1]) # Create a NumpyRep for residue in PDB
     y = float(row[2])                    # Extract target value
 
@@ -397,14 +444,15 @@ ProteinStructureEmbedding/
 |
 ├── src/                # Source code of our application.
 |   |
-|   ├── dataset.py          # Classes for processing PDBs and generating datasets
-|   ├── net.py              # Neural network architectures used in our project
-|   ├── predict.py          # Script for making predictions.
-|   ├── embed_GSnet.py      # Script that generates GSnet embeddings.
-|   ├── embed_aLCnet.py     # Script that generates aLCnet embeddings.
-|   ├── train_GSnet.py      # Script for training GSnet.
-|   ├── train_aLCnet.py     # Script for training aLCnet.
-|   └── time.sh             # Script for timing the running of a script.
+|   ├── dataset.py            # Classes for processing PDBs and generating datasets
+|   ├── generate_datasets.py  # Script to automatically generate datasets from CSVs
+|   ├── net.py                # Neural network architectures used in our project
+|   ├── predict.py            # Script for making predictions.
+|   ├── embed_GSnet.py        # Script that generates GSnet embeddings.
+|   ├── embed_aLCnet.py       # Script that generates aLCnet embeddings.
+|   ├── train_GSnet.py        # Script for training GSnet.
+|   ├── train_aLCnet.py       # Script for training aLCnet.
+|   └── time.sh               # Script for timing the running of a script.
 |
 ├── models/             # State dictionaries containing weights and biases of the models
 |   |
