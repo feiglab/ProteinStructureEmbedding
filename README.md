@@ -59,15 +59,14 @@ eprint = {https://doi.org/10.1021/acs.jctc.4c01682}
 
 - [Installation](#installation)
 - [Making Predictions](#making-predictions)
-  - [Default Physicochemical Properties Prediction](#Default-Physicochemical-Properties-Prediction)
-  - [SASA Prediction](#SASA-Prediction)
-  - [pKa Prediction](#pKa-value-prediction)
+- [Plotting predictions](#plotting-predictions)
 - [Pretrained Models](#pretrained-models)
 - [Generating Embeddings](#generating-embeddings)
 - [Generating Datasets](#generating-datasets)
   - [GSnet Dataset](#gsnet-dataset)
   - [aLCnet Dataset](#alcnet-dataset)
 - [Training a Model](#training-a-model)
+- [How to reproduce data and figures from the paper](#how-to-reproduce-data-and-figures-from-the-paper)
 - [Directory Structure](#directory-structure)
 </details>
 
@@ -100,112 +99,121 @@ pip install -r requirements.txt
 
 ## Making Predictions
 
-The `predict.py` script provided allows prediction of all physicochemical properties discussed above.
+The `predict.py` script predicts physicochemical properties from PDB files or from precomputed NPZ representations. Run from the `src/` directory (or with `src` on `PYTHONPATH`). You can pass multiple input files.
 
-### Default Physicochemical Properties Prediction
+### Modes
 
-**Command:**
+- **Default** — Six global properties: ΔG, RG, RH, DT, DR, V.
+- **`--sasa`** — Same six plus SASA.
+- **`--pka`** — Residue-level pKa for titratable residues (ASP, CYS, GLU, HIS, LYS, TYR). Use **`--atomic`** for aLCnet (faster and more accurate); omit for GSnet. Use **`--shift`** to output pKa shift from the standard value instead of absolute pKa.
 
+pKa output is tabular with a header. Columns: Predicted, (Observed if `--show-label`), AA, Res, Chain, File.
+
+### Input: PDB vs NPZ
+
+- **PDB** — One or more `.pdb` files. Use **`--clean`** to strip non-standard residues/atoms before prediction; **`--keep`** keeps the cleaned files. **`--chain`** restricts to one chain; **`--combine-chains`** merges chains into one structure.
+- **`--numpy`** — One or more `.npz` files (e.g. from `generate_datasets.py`). Same prediction modes and outputs as PDB. Residue index and chain are taken from the NPZ when present, otherwise parsed from the filename when it follows `{pdb}_{chain}_{resid}.npz`.
+
+### pKa with NPZ: observed values
+
+With **`--numpy`** and **`--show-label`**, the script prints an **Observed** column. NPZ labels are stored as **shifts**; the script converts them to absolute pKa when `--shift` is not used (using the residue type). If a file has no `label` key, Observed is printed as `-`.
+
+### Custom model weights
+
+**`--state-dict PATH`** loads a custom state dict for the main model instead of the default `.pt` file. Loading is loose (`strict=False`); if no parameters match the selected architecture, the script exits with an error. Supports raw state dicts or checkpoint dicts with a `state_dict` / `model_state_dict` key.
+
+### Device and other options
+
+- **`--cpu`** / **`--gpu`** — Force device (default: GPU if available).
+- **`--time`** — Print timing for loading and forward pass.
+- **`--skip-bad-files`** — Skip inputs that fail to load instead of raising.
+
+### Example commands
+
+**Default (global properties) from PDB:**
 ```bash
-python predict.py /path/to/pdb_file.pdb
-```
-    
-**Sample Output:**
-
-```
-ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      FILE
--2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 /path/to/pdb_file.pdb
+python predict.py /path/to/file.pdb
 ```
 
-### SASA Prediction
-
-**Command:**
-
+**pKa (absolute) with aLCnet:**
 ```bash
-python predict.py --sasa /path/to/pdb_file.pdb
+python predict.py --pka --atomic /path/to/file.pdb
 ```
 
-**Sample Output:**
-
-```
-ΔG [kJ/mol]   RG [Å]        RH [Å]        DT [nm^2/ns]  DR [ns^-1]    V [nm^3]      SASA [nm^2]   FILE
--2.888315E+04 2.9318836E+01 3.4585515E+01 6.2096068E-02 3.7419807E-03 9.2364510E+01 2.3868515E+02 /path/to/pdb_file.pdb
-```
-
-### pKa value prediction
-
-Note that pKa predictions are faster and more accurate with **[aLCnet](#alcnet)**. To use **aLCnet**, you must use the option `--atomic`.
-
-**Command:**
-
+**pKa shifts from NPZ with observed labels and custom weights:**
 ```bash
-python predict.py --pka --atomic /path/to/pdb_file.pdb
+python predict.py --pka --atomic --numpy --shift --show-label --state-dict ../models/tr_25_test.pt ../pKa-datasets/msu-test-data/*.npz
 ```
 
-**Sample Output:**
+**Sample pKa output (with header and observed):**
 ```
-7.315245148533568 LYS 4 A /path/to/pdb_file.pdb
-3.9241322437930055 ASP 5 A /path/to/pdb_file.pdb
-8.401511664982062 LYS 7 A /path/to/pdb_file.pdb
-3.903559068776328 ASP 11 A /path/to/pdb_file.pdb
+Predicted  Observed  AA    Res   Chain  File
+-0.99      -1.67     ASP   93    C      ../pKa-datasets/msu-test-data/1A2P_C_93.npz
 ...
 ```
 
-### pKa shift prediction
+For all options: `python predict.py -h`
 
-Note that pKa predictions are faster and more accurate with **[aLCnet](#alcnet)**. To use **aLCnet**, you must use the option `--atomic`.
+## Plotting predictions
 
-**Command:**
+The `plot_predictions.py` script plots **predicted vs observed** from the text output of `predict.py`. It expects output that includes both a **Predicted** and an **Observed** column (e.g. pKa runs with **`--show-label`**). Run from the `src/` directory.
+
+**Default behavior:** the script **saves** the figure to **`predictions.png`** in the current directory (it does not open a window). Use **`--show`** to display the figure in a GUI instead of saving. Use **`-o path`** or **`--save path`** to save to a different path.
+
+### Input
+
+- **From file:** one or more files containing `predict.py` stdout (e.g. after redirecting: `python predict.py ... > out.txt`).
+- **From stdin (pipe):** use `-` as the input so you can pipe `predict.py` directly into the plot script.
+
+### Piping predict.py into the plot script
+
+Pipe the output of `predict.py` into `plot_predictions.py`. By default the figure is saved as `predictions.png`:
 
 ```bash
-python predict.py --pka --shift --atomic /path/to/pdb_file.pdb
+python predict.py --pka --atomic --numpy --shift --show-label ../pKa-datasets/msu-test-data/*.npz | python plot_predictions.py -
 ```
 
-**Sample Output:**
+Use `-o` to save under a different name:
 
-```
--3.2247548514664315 LYS 4 A /path/to/pdb_file.pdb
-0.024132243793005603 ASP 5 A /path/to/pdb_file.pdb
--2.1384883350179376 LYS 7 A /path/to/pdb_file.pdb
-0.003559068776328278 ASP 11 A /path/to/pdb_file.pdb
-...
+```bash
+python predict.py --pka --atomic --numpy --shift --show-label ... | python plot_predictions.py - -o pka_plot.png
 ```
 
+You can add other plot options before the output path:
 
-### Notes
-
-- The script is capable of handling multiple input files if you provide them as arguments.
-- Remember to use the cleaning options if your PDB files might contain non-standard residues or formats.
-
-For a full description of the utility of the `predict.py` script, you can run `python predict.py -h` or `python predict.py --help`:
-
+```bash
+python predict.py --pka --atomic --numpy --show-label ... | python plot_predictions.py - --title "pKa" --linreg -o pka.png
 ```
-usage: predict.py [-h] [--clean] [--pka] [--atomic] [--sasa] [--shift]
-                  [--chain chain] [--combine-chains] [--keep]
-                  [--cpu] [--gpu] [--numpy] [--time] [--skip-bad-files]
-                  pdbs [pdbs ...]
 
-ML prediction on PDB files
+### Using a saved output file
 
-positional arguments:
-  pdbs              List of PDB files.
+Save `predict.py` output to a file, then pass that file to the plot script (figure is saved as `predictions.png` unless you pass `-o`):
 
-optional arguments:
-  -h, --help        show this help message and exit
-  --clean           Clean PDB files before making predictions.
-  --pka             Predict pKa.
-  --atomic          Use aLCnet for pKa predictions
-  --sasa            Predict SASA.
-  --shift           Calculate pKa shift (relative to standard value).
-  --chain chain     Specify chain.
-  --combine-chains  Make calculation for structure of all chains in a PDB file.
-  --keep            Keep cleaned PDB files.
-  --cpu             Run on CPU.
-  --gpu             Run on GPU.
-  --numpy           Use .npz file as input.
-  --time            Time different aspects of the model.
-  --skip-bad-files  Skip bad PDB files.
+```bash
+python predict.py --pka --atomic --numpy --show-label ... > pka_out.txt
+python plot_predictions.py pka_out.txt
 ```
+
+To save under a specific path:
+
+```bash
+python plot_predictions.py pka_out.txt -o pka_plot.png
+```
+
+You can pass multiple files; their data are combined into one plot.
+
+### Plot options (defaults in script)
+
+- **`--hexbin`** — Use hexbin instead of scatter (default: scatter).
+- **`--linreg`** — Add linear regression line (default: on).
+- **`--mape`** — Use MAPE instead of Pearson r on the 1:1 line.
+- **`--title`**, **`--xlabel`**, **`--ylabel`**, **`--units`** — Labels and title.
+- **`--clean`** — Drop rows where reference (x) &lt; -700.
+- **`--save` / `-o`** — Save figure to this path (default when not using `--show`: `predictions.png`).
+- **`--show`** — Display the figure in a GUI instead of saving.
+- **`--dpi`** — Resolution for saved figure (default 600).
+
+For all options: `python plot_predictions.py -h`
 
 ## Pretrained Models
 
@@ -227,7 +235,7 @@ The `embed_GSnet.py` and `embed_aLCnet.py` scripts allow you to easily generate 
 
 1. **Gather PDB files:**
  Put PDB files containing only 1 chain that you would like embeddings for into a directory. Make sure the file extension for the files is `.pdb`.
- 
+
 2. **Run the script:**
  Navigate to the `src/` directory in your terminal. Use the following command(s) to generate embeddings:
 
@@ -425,6 +433,22 @@ To train a new model:
 1. Make sure you have PyTorch datasets generated. See [Generating Datasets](#generating-datasets) for more info.
 2. See the `train_GSnet.py` and `train_aLCnet.py` scripts for examples on how to train our models. Sample data for training both GSnet and aLCnet was provided for selected structures.
 
+## How to reproduce data and figures from the paper
+
+1. **Install the repo** — [Installation](#installation)
+2. **Generate NPZ data sets** — [Generating Datasets](#generating-datasets)
+3. **Make predictions** — [Making Predictions](#making-predictions)
+4. **Plot predictions** — Run `plot_predictions.py` on the tabular output of `predict.py`. Use **`--show-label`** with `predict.py` so the output includes an Observed column; then pipe that output (optionally filtered, e.g. by residue type) into `plot_predictions.py`. By default the plot is saved to `predictions.png`; use **`-o path`** or **`--show`** to change the output.
+
+**Example** — pKa predictions on a generated dataset, excluding CYS and TYR, then plotting:
+
+```bash
+cd src
+python predict.py --pka --atomic --shift --numpy --show-label /path/to/dataset/*.npz | grep -v "CYS" | grep -v "TYR" | python plot_predictions.py
+```
+
+To save the figure under a different path: add `-o figure.png` after `plot_predictions.py`. Use `python predict.py -h` and `python plot_predictions.py -h` for all options.
+
 ## More info
 
 For more info, or if you have any questions, please email me at **hey@spencerwozniak.com**
@@ -444,22 +468,23 @@ ProteinStructureEmbedding/
 |
 ├── src/                # Source code of our application.
 |   |
-|   ├── dataset.py            # Classes for processing PDBs and generating datasets
-|   ├── generate_datasets.py  # Script to automatically generate datasets from CSVs
-|   ├── net.py                # Neural network architectures used in our project
-|   ├── predict.py            # Script for making predictions.
-|   ├── embed_GSnet.py        # Script that generates GSnet embeddings.
-|   ├── embed_aLCnet.py       # Script that generates aLCnet embeddings.
-|   ├── train_GSnet.py        # Script for training GSnet.
-|   ├── train_aLCnet.py       # Script for training aLCnet.
-|   └── time.sh               # Script for timing the running of a script.
+|   ├── dataset.py          # Classes for processing PDBs and generating datasets
+|   ├── generate_datasets.py # Script to generate GSnet/aLCnet datasets from residue-level CSVs
+|   ├── net.py              # Neural network architectures used in our project
+|   ├── predict.py          # Script for making predictions.
+|   ├── plot_predictions.py # Script to plot predicted vs observed from predict.py output.
+|   ├── embed_GSnet.py      # Script that generates GSnet embeddings.
+|   ├── embed_aLCnet.py     # Script that generates aLCnet embeddings.
+|   ├── train_GSnet.py      # Script for training GSnet.
+|   ├── train_aLCnet.py     # Script for training aLCnet.
+|   └── time.sh             # Script for timing the running of a script.
 |
 ├── models/             # State dictionaries containing weights and biases of the models
 |   |
 |   ├── GSnet_default.pt    # Original pretrained GSnet.
 |   ├── GSnet_SASA.pt       # GSnet fine-tuned for SASA predictions.
 |   ├── GSnet_pKa.pt        # GSnet fine-tuned for pKa predictions.
-|   ├── aLCnet_pka.pt       # aLCnet trained for pKa predictions.
+|   ├── aLCnet_pKa.pt       # aLCnet trained for pKa predictions.
 |   └── normalization.npz   # Normalization parameters.
 |
 ├── sample_data/        # Sample data provided for running certain scripts
