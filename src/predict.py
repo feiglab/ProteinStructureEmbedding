@@ -95,6 +95,137 @@ class AtomSelect(PDB.Select):
         return True
 
 
+# Amino acid index-to-3-letter mapping (must match dataset.py AAs order)
+AA_INDEX_TO_CODE = [
+    'GLN', 'TRP', 'GLU', 'ARG', 'THR', 'TYR', 'ILE', 'PRO',
+    'ALA', 'SER', 'ASP', 'PHE', 'GLY', 'HIS', 'LYS', 'LEU',
+    'CYS', 'VAL', 'ASN', 'MET'
+]
+
+# Standard pKa values for titratable residues (used for absolute pKa when not --shift)
+STANDARD_PKA = {
+    'GLU': 4.07,
+    'LYS': 10.54,
+    'CYS': 8.37,
+    'HIS': 6.04,
+    'ASP': 3.90,
+    'TYR': 10.46,
+}
+
+
+def parse_resid_from_npz_path(path):
+    """
+    Try to get residue number from npz filename when convention is {pdb}_{chain}_{resid}.npz.
+
+    Parameters
+    ----------
+    path : str
+        Path to the .npz file (e.g. .../1A2P_C_93.npz).
+
+    Returns
+    -------
+    int or None
+        Residue number if parsed from the last underscore-separated segment, else None.
+    """
+    try:
+        base = os.path.splitext(os.path.basename(path))[0]
+        parts = base.split('_')
+        if len(parts) >= 3:
+            return int(parts[-1])
+    except (ValueError, IndexError):
+        pass
+    return None
+
+
+def parse_chain_from_npz_path(path):
+    """
+    Try to get chain ID from npz filename when convention is {pdb}_{chain}_{resid}.npz.
+
+    Parameters
+    ----------
+    path : str
+        Path to the .npz file (e.g. .../1A2P_C_93.npz).
+
+    Returns
+    -------
+    str or None
+        Chain ID (e.g. 'C', 'A') if parsed from the second-to-last segment, else None.
+    """
+    try:
+        base = os.path.splitext(os.path.basename(path))[0]
+        parts = base.split('_')
+        if len(parts) >= 3:
+            return parts[-2]
+    except IndexError:
+        pass
+    return None
+
+
+def get_numpy_pka_residue_info(data, atomic=False, npz_path=None):
+    """
+    Extract residue index (for display) and 3-letter amino acid code from npz data.
+
+    Parameters
+    ----------
+    data : np.lib.npyio.NpzFile
+        Loaded npz file (e.g. from np.load(path)).
+    atomic : bool
+        True for aLCnet (per-atom) npz, False for GSnet (per-residue) npz.
+    npz_path : str, optional
+        Path to the npz file; used to parse residue from filename (e.g. 1A2P_C_93.npz)
+        when resSeq is not in data.
+
+    Returns
+    -------
+    tuple of (resid_display, aa_code)
+        resid_display : int or None
+            Residue number for display: PDB resSeq if in data, else 1-based
+            position from mask/atomic layout, or from npz_path if parseable.
+        aa_code : str or None
+            3-letter amino acid code (e.g. 'GLU'), or None if not determinable.
+    """
+    try:
+        if atomic:
+            # resid_ca marks the CA of the residue of interest; a is per-atom aa index
+            resid_ca = np.asarray(data['resid_ca'])
+            a = np.asarray(data['a'])
+            ca_idx = np.flatnonzero(resid_ca)
+            if ca_idx.size == 0:
+                return None, None
+            aa_idx = int(a[ca_idx[0]])
+            # Prefer explicit resSeq; else try filename (e.g. 1A2P_C_93.npz); else 1
+            if 'resSeq' in data:
+                resid_display = int(data['resSeq'])
+            elif npz_path is not None:
+                resid_display = parse_resid_from_npz_path(npz_path) or 1
+            else:
+                resid_display = 1
+        else:
+            # resid can be a mask (length n_residues) or a scalar (0-based index or resSeq)
+            r = np.asarray(data['resid'])
+            a = np.asarray(data['a'])
+            n_residues = len(a)
+            if r.ndim == 0 or r.size == 1:
+                # Scalar: 0-based index into residue list -> display as 1-based position
+                res_idx = int(r.flat[0])
+                resid_display = int(data['resSeq']) if 'resSeq' in data else (res_idx + 1)
+                aa_idx = int(a[res_idx]) if 0 <= res_idx < n_residues else -1
+            else:
+                # Mask: 1 at titratable residue
+                res_indices = np.flatnonzero(r)
+                if res_indices.size == 0:
+                    return None, None
+                res_idx = int(res_indices[0])
+                aa_idx = int(a[res_idx])
+                resid_display = int(data['resSeq']) if 'resSeq' in data else (res_idx + 1)
+        if 0 <= aa_idx < len(AA_INDEX_TO_CODE):
+            aa_code = AA_INDEX_TO_CODE[aa_idx]
+            return resid_display, aa_code
+        return resid_display, None
+    except (KeyError, IndexError, TypeError):
+        return None, None
+
+
 def parse_args():
     """
     Parse command-line arguments for the ML prediction script on PDB files.
@@ -123,6 +254,10 @@ def parse_args():
     parser.add_argument('--numpy', action='store_true', help='Use .npz file as input.')
     parser.add_argument('--time', action='store_true', help='Time different aspects of the model.')
     parser.add_argument('--skip-bad-files', action='store_true', help='Skip bad PDB files.')
+    parser.add_argument('--show-label', action='store_true',
+                        help='With --numpy: include observed value (label) from npz in pKa output.')
+    parser.add_argument('--state-dict', metavar='PATH', default=None,
+                        help='Path to custom state dict (.pt) to load for the main model instead of the default.')
     parser.add_argument('pdbs', nargs='+', help='List of PDB files.')
 
     args = parser.parse_args()
@@ -131,10 +266,13 @@ def parse_args():
     assert not (args.cpu and args.gpu), 'Cannot run on both CPU and GPU!'
     assert not ((args.chain is not None) and args.combine_chains), f'Cannot select chain {args.chain} and combine chains.'
     assert not (args.sasa and args.pka), 'Cannot calculate SASA when predicting pKa.'
-    
+
+    if args.show_label:
+        assert args.numpy, "'--show-label' is only valid when using --numpy."
+
     if args.shift:
         assert args.pka, "'--pka' must be selected to calculate shifts."
-    
+
     if args.atomic:
         assert args.pka, "'--pka' must be selected to use a-GSnet"
 
@@ -151,6 +289,60 @@ def parse_args():
         return args
     except Exception as e:
         raise RuntimeError(f'Error parsing arguments: {e}')
+
+
+def _state_dict_from_file(path, device):
+    """
+    Load state dict from a .pt file. Accepts raw state dict or checkpoint dict with
+    'state_dict' / 'model_state_dict' key.
+    """
+    try:
+        obj = torch.load(path, map_location=device, weights_only=False)
+    except TypeError:
+        # Older PyTorch (<2.0) does not support weights_only
+        obj = torch.load(path, map_location=device)
+    if isinstance(obj, dict) and 'state_dict' in obj:
+        return obj['state_dict']
+    if isinstance(obj, dict) and 'model_state_dict' in obj:
+        return obj['model_state_dict']
+    return obj
+
+
+def load_state_dict_loose(model, path, device, context_hint=''):
+    """
+    Load state dict into model with strict=False. Raise if no parameters were loaded.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        Model to load into.
+    path : str
+        Path to .pt file (state dict or checkpoint).
+    device : torch.device
+        Map location for tensors.
+    context_hint : str
+        Short hint for error message (e.g. 'pKa GSnet', 'aLCnet').
+
+    Raises
+    ------
+    ValueError
+        If no model parameters were loaded (state dict incompatible with architecture).
+    """
+    state_dict = _state_dict_from_file(path, device)
+    if not isinstance(state_dict, dict):
+        raise ValueError(
+            f"File {path} does not contain a state dict (got {type(state_dict).__name__}). "
+            "Expected a .pt file with a state dict or checkpoint dict."
+        )
+    result = model.load_state_dict(state_dict, strict=False)
+    num_model_keys = len(model.state_dict())
+    num_loaded = num_model_keys - len(result.missing_keys)
+    if num_loaded == 0:
+        raise ValueError(
+            f"The state dict at {path} is incompatible with the selected architecture. "
+            "No parameters were loaded. "
+            f"Check that the state dict matches this model type ({context_hint or 'e.g. --atomic vs not'})."
+        )
 
 
 def load_models(args, device):
@@ -176,13 +368,14 @@ def load_models(args, device):
     """
     # Ensure --pka and --sasa are not both selected
     assert not (args.pka and args.sasa), "Both --pka and --sasa cannot be selected"
-    
+
     # Timing model loading if specified
     if args.time:
         t0 = perf_counter()
-    
+
     model_dir = '../models'
     models = {}
+    use_custom_state_dict = getattr(args, 'state_dict', None) is not None
 
     if args.pka:
         if not args.atomic:
@@ -196,8 +389,11 @@ def load_models(args, device):
                                 heads=1, mlp_activation='relu', standardize_cc=True,
                                 advanced_residual=True)
 
-            state_dict = torch.load(f'{model_dir}/GSnet_pKa.pt', map_location=device)
-            models['gnn'].load_state_dict(state_dict, strict=False)
+            if use_custom_state_dict:
+                load_state_dict_loose(models['gnn'], args.state_dict, device, context_hint='pKa GSnet (non-atomic)')
+            else:
+                state_dict = torch.load(f'{model_dir}/GSnet_pKa.pt', map_location=device)
+                models['gnn'].load_state_dict(state_dict, strict=False)
         else:
             models['gnn'] = Net_atomic(
                               fc_opt            = 1,      # Option for GNN -> FC “FCopt{N}”
@@ -215,18 +411,22 @@ def load_models(args, device):
                               linear_channels   = 1024,   # Number of hidden linear dims -> “{N}FCch
                               activation        = 'ssp',  # Activation function used in FC layers
                               mlp_activation    = 'relu', # Activation function used in MLP embeddings
-                              heads             = 3,      # Number of transformer attention heads “{N}heads”              
+                              heads             = 3,      # Number of transformer attention heads “{N}heads”
                               advanced_residual = True,   # Create residual connections?
                               one_hot_res       = False,  # Append one-hot residue encoding to FC?
                             )
-            #state_dict = torch.load(f'{model_dir}/aLCnet_pKa.pt', map_location=device)
-            state_dict = torch.load(f'{model_dir}/aLCnet_pKa.pt', map_location=device)
-
-            models['gnn'].load_state_dict(state_dict, strict=False)
+            if use_custom_state_dict:
+                load_state_dict_loose(models['gnn'], args.state_dict, device, context_hint='pKa aLCnet (--atomic)')
+            else:
+                state_dict = torch.load(f'{model_dir}/aLCnet_pKa.pt', map_location=device)
+                models['gnn'].load_state_dict(state_dict, strict=False)
     elif args.sasa:
         models['gnn'] = Net(embedding_only=True)
         state_dict = torch.load(f'{model_dir}/GSnet_default.pt', map_location=device)
-        models['gnn'].load_state_dict(state_dict, strict=False)
+        if use_custom_state_dict:
+            load_state_dict_loose(models['gnn'], args.state_dict, device, context_hint='SASA GNN')
+        else:
+            models['gnn'].load_state_dict(state_dict, strict=False)
 
         models['sasa'] = FC(in_channels=150, num_linear=4, out_channels=1, dropout=0.0)
         fc_elements = OrderedDict((f'fc{k[4:]}', v) for k, v in torch.load(f'{model_dir}/GSnet_SASA.pt', map_location=device).items() if k.startswith('fc_t'))
@@ -237,7 +437,10 @@ def load_models(args, device):
         models['6'].load_state_dict(fc_elements)
     else:
         models['gnn'] = Net()
-        models['gnn'].load_state_dict(torch.load(f'{model_dir}/GSnet_default.pt', map_location=device), strict=False)
+        if use_custom_state_dict:
+            load_state_dict_loose(models['gnn'], args.state_dict, device, context_hint='default GSnet')
+        else:
+            models['gnn'].load_state_dict(torch.load(f'{model_dir}/GSnet_default.pt', map_location=device), strict=False)
 
     # Set models to evaluation mode and move to device
     for key in models.keys():
@@ -252,7 +455,65 @@ def load_models(args, device):
     return models
 
 
-def print_result(calc_type, pred, pdb, chain=None, resid=None, aa=None):
+def get_label_from_npz(data):
+    """
+    Safely get observed value (label) from npz data if present.
+    Labels in pKa npz files are stored as shifts (not absolute pKa).
+
+    Parameters
+    ----------
+    data : np.lib.npyio.NpzFile
+        Loaded npz file.
+
+    Returns
+    -------
+    float or None
+        Label value (shift), or None if missing or not convertible to float.
+    """
+    try:
+        if 'label' not in data:
+            return None
+        return float(np.asarray(data['label']).flat[0])
+    except (TypeError, ValueError, IndexError):
+        return None
+
+
+def observed_label_to_display(observed_shift, shift_mode, aa_code):
+    """
+    Convert observed label (stored as shift in npz) to the value to display,
+    matching the predicted column: shift when --shift, else absolute pKa.
+
+    Parameters
+    ----------
+    observed_shift : float or None
+        Raw label from npz (pKa shift).
+    shift_mode : bool
+        True if user passed --shift (output is shifts).
+    aa_code : str or None
+        3-letter amino acid code (e.g. 'GLU'), used to add standard pKa when not shift_mode.
+
+    Returns
+    -------
+    float or None
+        Value to print in Observed column, or None to show "-".
+    """
+    if observed_shift is None:
+        return None
+    if shift_mode:
+        return observed_shift
+    if aa_code is not None and aa_code in STANDARD_PKA:
+        return observed_shift + STANDARD_PKA[aa_code]
+    return observed_shift
+
+
+def _pka_header(show_label=False):
+    """Return the pKa output table header string."""
+    if show_label:
+        return 'Predicted  Observed  AA    Res   Chain  File'
+    return 'Predicted  AA    Res   Chain  File'
+
+
+def print_result(calc_type, pred, pdb, chain=None, resid=None, aa=None, observed=None, show_label=False):
     """
     Display prediction(s) based on the type of calculation.
 
@@ -277,12 +538,18 @@ def print_result(calc_type, pred, pdb, chain=None, resid=None, aa=None):
     aa : str, optional
         Amino acid type (3-letter abbreviation).
         Only used when 'pka' is chosen.
+    observed : float, optional
+        Observed value (e.g. from npz 'label'). Only used when calc_type=='pka' and show_label is True.
+    show_label : bool, optional
+        If True and calc_type=='pka', include observed column (use "-" when observed is None).
     """
     if calc_type == 'pka':
-        if chain is None:
-            print(pred, aa, resid, pdb)
+        chain_str = '-' if chain is None else chain
+        if show_label:
+            obs_str = observed if observed is not None else '-'
+            print(pred, obs_str, aa, resid, chain_str, pdb)
         else:
-            print(pred, aa, resid, chain, pdb)
+            print(pred, aa, resid, chain_str, pdb)
     elif calc_type == 'sasa':
         if chain is None:
             print(f'%.6E %.7E %.7E %.7E %.7E %.7E %.7E {pdb}' % (pred[5], pred[0], pred[4], pred[1], pred[2], pred[3], pred[6]))
@@ -451,30 +718,19 @@ def predict(rep, models, avg, std, args, device):
         print(f'NUMPY -> TORCH: {t1-t0} s')
 
     if args.pka:
-        
-        # Define standard pKa values
-        standard = {
-            'GLU': 4.07,
-            'LYS': 10.54,
-            'CYS': 8.37,
-            'HIS': 6.04,
-            'ASP': 3.90,
-            'TYR': 10.46,
-        }
-
         if not args.numpy:
-            
+
             prot = rep.traj.top
 
             resids = []
 
             if args.atomic:
                 pqr = '.'.join([frag for frag in rep.pdb.split('.')[:-1] + ['pqr']])
-               
+
                 if not os.path.isfile(pqr):
                     if args.time:
                         t0 = perf_counter()
-                    
+
                     sub.run(
                         f'pdb2pqr30 --ff AMBER {rep.pdb} {pqr}', shell=True,
                         stderr=sub.DEVNULL, stdout=sub.DEVNULL
@@ -487,7 +743,7 @@ def predict(rep, models, avg, std, args, device):
                 pqr_traj = md.load_pdb(pqr)
 
             for r in prot.residues:
-                if (r_3 := r.__repr__()[:3]) in standard:
+                if (r_3 := r.__repr__()[:3]) in STANDARD_PKA:
                     resSeq = r.resSeq
 
                     if not args.atomic:
@@ -496,10 +752,10 @@ def predict(rep, models, avg, std, args, device):
                         if args.time:
                             t0 = perf_counter()
                         with torch.no_grad():
-                            pred = models['gnn'](pos, 
-                                                 a, 
-                                                 cc, 
-                                                 dh, 
+                            pred = models['gnn'](pos,
+                                                 a,
+                                                 cc,
+                                                 dh,
                                                  resid=idx)
 
                         if args.time:
@@ -508,7 +764,7 @@ def predict(rep, models, avg, std, args, device):
                     else:
                         if args.time:
                             t0 = perf_counter()
-                        atomic_rep = NumpyRep_atomic(pqr,resSeq,traj=pqr_traj) 
+                        atomic_rep = NumpyRep_atomic(pqr,resSeq,traj=pqr_traj)
                         if args.time:
                             t1 = perf_counter()
                             print(f'CREATE ATOMIC REPRESENTATION: {t1-t0} s')
@@ -529,28 +785,39 @@ def predict(rep, models, avg, std, args, device):
                     pred = pred.cpu().detach().numpy()[0][0] * std + avg
 
                     if not args.shift:
-                        pred += standard[r_3]
+                        pred += STANDARD_PKA[r_3]
 
-                    print_result('pka', pred, rep.pdb, resid=resSeq, aa=r_3, chain=rep.chain)
+                    print_result('pka', pred, rep.pdb, resid=resSeq, aa=r_3, chain=rep.chain,
+                                 observed=None, show_label=args.show_label)
         else:
             with torch.no_grad():
                 if not args.atomic: # Making a pKa prediction on an NPZ file with GSnet
-                    pred = models['gnn'](pos, 
-                                         a, 
-                                         cc, 
-                                         dh, 
+                    pred = models['gnn'](pos,
+                                         a,
+                                         cc,
+                                         dh,
                                          resid=resid)
                 else: # Making a pKa prediction on an NPZ file with a-GSnet
-                    pred = models['gnn'](pos, 
-                                         a, 
-                                         atoms, 
-                                         charge, 
-                                         resid_ca=resid_ca, 
+                    pred = models['gnn'](pos,
+                                         a,
+                                         atoms,
+                                         charge,
+                                         resid_ca=resid_ca,
                                          resid_atomic=resid_atomic)
 
                 pred = pred.cpu().detach().numpy()[0][0] * std + avg
-            
-            print_result('pka', pred, rep)
+
+            # Only add standard pKa when not --shift (same as PDB path)
+            resid_display, aa_code = get_numpy_pka_residue_info(
+                data, atomic=args.atomic, npz_path=rep
+            )
+            if not args.shift and aa_code is not None and aa_code in STANDARD_PKA:
+                pred += STANDARD_PKA[aa_code]
+            observed_raw = get_label_from_npz(data) if args.show_label else None
+            observed = observed_label_to_display(observed_raw, args.shift, aa_code)
+            chain = parse_chain_from_npz_path(rep)
+            print_result('pka', pred, rep, chain=chain, resid=resid_display, aa=aa_code,
+                         observed=observed, show_label=args.show_label)
 
     elif args.sasa:
         with torch.no_grad():
@@ -559,7 +826,9 @@ def predict(rep, models, avg, std, args, device):
             sasa = models['sasa'](h).cpu().numpy()[0] * std[1] + avg[1]
             pred = np.append(pred, sasa)
 
-        print_result('sasa', pred, rep.pdb, chain=rep.chain)
+        file_path = rep if args.numpy else rep.pdb
+        chain = None if args.numpy else rep.chain
+        print_result('sasa', pred, file_path, chain=chain)
 
     else:
         with torch.no_grad():
@@ -570,7 +839,9 @@ def predict(rep, models, avg, std, args, device):
                 t1 = perf_counter()
                 print(f'FORWARD PASS: {t1-t0} s')
 
-        print_result('default', pred, rep.pdb, chain=rep.chain)
+        file_path = rep if args.numpy else rep.pdb
+        chain = None if args.numpy else rep.chain
+        print_result('default', pred, file_path, chain=chain)
 
 
 def parse_arguments():
@@ -618,7 +889,7 @@ def load_normalization_parameters(args, model_dir):
     normalization_params = np.load(f'{model_dir}/normalization.npz')
 
     if args.pka:
-        #print(normalization_params['pka'])
+        print(_pka_header(show_label=args.show_label))
         if args.atomic:
             return normalization_params['pka_a']
         else:
