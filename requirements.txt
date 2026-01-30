@@ -1,12 +1,22 @@
+# Core numerical + scientific stack
 numpy==1.23.0
+scipy==1.10.1
+einops
+
+# PyTorch core
 torch==1.10.1
-torchaudio==0.10.1
 torchvision==0.11.2
-torch_geometric
+torchaudio==0.10.1
+
+# PyTorch Geometric ecosystem
+torch-geometric
 torch-scatter
 torch-cluster
-scipy==1.13.1
-mdtraj==1.10.1
-einops
+
+# Molecular / structural biology
+mdtraj==1.10.0
 biopython==1.81
-pdb2pqr==3.5.2
+pdb2pqr==3.5.0
+
+# Plotting (used in dataset.py / net.py)
+matplotlib
