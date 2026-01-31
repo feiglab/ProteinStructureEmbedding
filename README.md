@@ -90,7 +90,7 @@ conda activate gsnet
 ```
     
 3. **Install required packages:**
-   - Use Python 3.9 or 3.10 on your system.
+   - Use Python 3.9 on your system.
    - Install the required Python packages using:
 
 ```bash
