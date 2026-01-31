@@ -85,16 +85,12 @@ cd ProteinStructureEmbedding
    - If you use a virtual environment, set it up and activate it before installing the packages:
 
 ```bash
-conda create -n gsnet
+conda create -n gsnet python=3.9 pip
 conda activate gsnet
-```
-   - Optional: If pip is not provided from the system:
-```bash
-conda install pip
 ```
     
 3. **Install required packages:**
-   - Ensure that Python 3.8 or newer is installed on your system.
+   - Use Python 3.9 or 3.10 on your system.
    - Install the required Python packages using:
 
 ```bash
