@@ -87,6 +87,7 @@ cd ProteinStructureEmbedding
 ```bash
 conda create -n gsnet
 conda activate gsnet
+conda install pip (optional if not provide from system)
 ```
 
 3. **Install required packages:**
